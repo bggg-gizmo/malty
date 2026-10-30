@@ -10,9 +10,10 @@ JAVA=java
 KEYTOOL=keytool
 if [[ -n "$JAVA_HOME" ]]; then JAVAC="$JAVA_HOME/bin/javac"; JAVA="$JAVA_HOME/bin/java"; KEYTOOL="$JAVA_HOME/bin/keytool"; fi
 mkdir -p "$TMP/classes"
-"$JAVAC" -d "$TMP/classes" "$SRC/BridgeRequestSecurity.java" "$SRC/BridgeTransportSecurity.java" \
-    "$ROOT/scripts/BridgeRequestSecurityTest.java" "$ROOT/scripts/BridgeTransportSecurityTest.java"
+"$JAVAC" -d "$TMP/classes" "$SRC/BridgeRequestSecurity.java" "$SRC/BridgeTransportSecurity.java" "$SRC/BridgeReplayWindow.java" \
+    "$ROOT/scripts/BridgeRequestSecurityTest.java" "$ROOT/scripts/BridgeTransportSecurityTest.java" "$ROOT/scripts/BridgeReplayWindowTest.java"
 "$JAVA" -cp "$TMP/classes" BridgeRequestSecurityTest
+"$JAVA" -cp "$TMP/classes" BridgeReplayWindowTest
 "$KEYTOOL" -genkeypair -noprompt -alias malty-test -keyalg RSA -keysize 2048 -validity 2 \
     -storetype PKCS12 -keystore "$TMP/server.p12" -storepass changeit -keypass changeit \
     -dname "CN=localhost" -ext "SAN=dns:localhost" >/dev/null 2>&1

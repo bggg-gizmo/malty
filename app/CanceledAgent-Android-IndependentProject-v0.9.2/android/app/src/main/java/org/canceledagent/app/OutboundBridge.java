@@ -19,7 +19,7 @@ import javax.net.ssl.SSLSocketFactory;
 public final class OutboundBridge {
     private final Context context;private final SecurePrefs prefs;private final EmbeddedServer api;private final ExecutorService work=Executors.newFixedThreadPool(3);
     private volatile Socket connection;private volatile boolean active;private volatile OutputStream out;
-    private final Set<String> processed=Collections.synchronizedSet(new LinkedHashSet<String>());
+    private final BridgeReplayWindow processed=new BridgeReplayWindow();
     private final SecureRandom random=new SecureRandom();
     private volatile String connectionChallenge="";
     public OutboundBridge(Context ctx,EmbeddedServer server){context=ctx.getApplicationContext();prefs=new SecurePrefs(ctx);api=server;}
@@ -42,7 +42,7 @@ public final class OutboundBridge {
         connection=s;
         byte[] challengeBytes=new byte[24];random.nextBytes(challengeBytes);
         connectionChallenge=Base64.encodeToString(challengeBytes,Base64.NO_WRAP|Base64.URL_SAFE);
-        synchronized(processed){processed.clear();}
+        processed.reset();
         InputStream input=s.getInputStream();OutputStream output=s.getOutputStream();byte[] nonce=new byte[16];random.nextBytes(nonce);
         String key=Base64.encodeToString(nonce,Base64.NO_WRAP);String h="GET "+path+"?"+query+" HTTP/1.1\r\nHost: "+host+(port==443?"":":"+port)+"\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: "+key+"\r\nSec-WebSocket-Version: 13\r\n\r\n";
         output.write(h.getBytes(StandardCharsets.US_ASCII));output.flush();ByteArrayOutputStream headers=new ByteArrayOutputStream();byte[] last=new byte[4];int n;
@@ -99,8 +99,8 @@ public final class OutboundBridge {
         if(!BridgeRequestSecurity.verify(RuntimeSecrets.ensure(context),connectionChallenge,session(),
             message.optString("challenge"),message.optString("sessionId"),requestId,message.optLong("issuedAt",0),
             scope,payloadJson,message.optString("signature"),System.currentTimeMillis()))return;
-        synchronized(processed){if(processed.contains(requestId))return;processed.add(requestId);
-            if(processed.size()>500){Iterator<String> it=processed.iterator();for(int i=0;i<100&&it.hasNext();i++){it.next();it.remove();}}}
+        // No early eviction of previously accepted IDs: a full window fails closed.
+        if(!processed.accept(requestId,System.currentTimeMillis()))return;
         work.execute(()->{
             try{JSONObject result;
                 if(call.has("op"))result=api.route("POST","/api/bridge/relay",LocalCore.obj("payload",call)).optJSONObject("response");
