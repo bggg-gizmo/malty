@@ -30,9 +30,18 @@ public final class EmbeddedServer {
         stop();ServerSocket ss=new ServerSocket();ss.setReuseAddress(true);
         ss.bind(new InetSocketAddress(InetAddress.getByName(lan?"0.0.0.0":"127.0.0.1"),requestedPort),48);effectivePort=ss.getLocalPort();
         socket=ss;active=true;error="";
-        workers.execute(()->{while(active){try{final Socket client=ss.accept();client.setSoTimeout(30000);workers.execute(()->serve(client));}catch(IOException ex){if(active)error="accept: "+ex.getMessage();}}});
+        workers.execute(()->{while(active){try{final Socket client=ss.accept();
+            if(lan&&!trustedLanPeer(client.getInetAddress())){client.close();continue;}
+            client.setSoTimeout(30000);workers.execute(()->serve(client));}catch(IOException ex){if(active)error="accept: "+ex.getMessage();}}});
     }
     public synchronized void stop(){active=false;ServerSocket s=socket;socket=null;if(s!=null)try{s.close();}catch(IOException ignored){} synchronized(peers){for(Peer p:peers)p.close();peers.clear();}}
+    /** LAN mode admits only loopback or private/link-local peers, never public IP peers. */
+    private static boolean trustedLanPeer(InetAddress remote){
+        if(remote==null)return false;
+        if(remote.isLoopbackAddress()||remote.isSiteLocalAddress()||remote.isLinkLocalAddress())return true;
+        byte[] address=remote.getAddress();
+        return address.length==16&&(address[0]&0xfe)==0xfc; // IPv6 unique-local fc00::/7
+    }
     private static byte[] readBody(InputStream in,int size)throws IOException{byte[] data=new byte[size];for(int o=0;o<size;){int n=in.read(data,o,size-o);if(n<0)throw new EOFException();o+=n;}return data;}
     private static String line(InputStream in)throws IOException{ByteArrayOutputStream b=new ByteArrayOutputStream();int n;while((n=in.read())!=-1){if(n==10)break;if(n!=13)b.write(n);if(b.size()>16384)throw new IOException("Header too long");}if(n==-1&&b.size()==0)return null;return b.toString("UTF-8");}
     private void serve(Socket client){try(Socket s=client){InputStream in=s.getInputStream();OutputStream out=s.getOutputStream();String start=line(in);if(start==null)return;

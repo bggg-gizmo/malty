@@ -335,7 +335,18 @@ public final class MainActivity extends Activity {
         boot.setOnCheckedChangeListener((v,on)->{settings.put("bootHosting",String.valueOf(on));print(on?"Boot-start enabled":"Boot-start disabled");});
         page.addView(boot);
         android.widget.CheckBox lan=new android.widget.CheckBox(this);lan.setText("Allow LAN hosting (authenticated, HTTP only · use trusted local networks)");lan.setChecked(settings.get("lanHosting","false").equals("true"));lan.setOnCheckedChangeListener((v,on)->{settings.put("lanHosting",String.valueOf(on));EmbeddedService.restart(this);});page.addView(lan);
-        button(page,"Copy local service access token",()->{String key=RuntimeSecrets.ensure(this);android.content.ClipboardManager clip=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);clip.setPrimaryClip(android.content.ClipData.newPlainText("Canceled Agent LAN token",key));print("Access token copied; treat as a secret");});
+        button(page,"Copy local service access token",()->{String key=RuntimeSecrets.ensure(this);android.content.ClipboardManager clip=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);android.content.ClipData copied=android.content.ClipData.newPlainText("Canceled Agent LAN token",key);
+        android.os.PersistableBundle sensitivity=new android.os.PersistableBundle();
+        sensitivity.putBoolean("android.content.extra.IS_SENSITIVE",true);
+        copied.getDescription().setExtras(sensitivity);
+        clip.setPrimaryClip(copied);
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(()->{
+            try{android.content.ClipData current=clip.getPrimaryClip();
+                if(current!=null&&current.getItemCount()>0&&key.contentEquals(current.getItemAt(0).coerceToText(this)))
+                    clip.setPrimaryClip(android.content.ClipData.newPlainText("",""));
+            }catch(SecurityException ignored){}
+        },60000L);
+        print("Access token copied as sensitive; clipboard auto-clears after 60 seconds when accessible");});
         EditText backend=input(page,"Self-hosted backend URL",settings.get("backend","http://127.0.0.1:8000"),false);
         button(page,"Save backend URL",()->{
             String url=backend.getText().toString().trim();

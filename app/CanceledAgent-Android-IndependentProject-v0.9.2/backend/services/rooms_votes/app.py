@@ -3,7 +3,8 @@
 Implements the observable behaviors of the supplied Perchance server-plugin in
 independent FastAPI + SQLite code. No Perchance runtime, account or API required.
 
-Launch: uvicorn services.rooms_votes.app:app --host 0.0.0.0 --port 8765
+Local start: uvicorn services.rooms_votes.app:app --host 127.0.0.1 --port 8765
+Network binding: configure AGENT_BACKEND_TOKEN and serve behind authenticated HTTPS.
 Config: AGENT_DB_PATH (default ./agent-rooms.db)
 
 The HTTP endpoints are native-friendly. WebSocket /ws accepts the plugin's
@@ -307,6 +308,17 @@ class Hub:
         return {"ok": False, "err": "unknown-rpc", "method": method}
 
 
+def _loopback_peer(host: str) -> bool:
+    # TestClient uses an in-process ASGI peer named testclient; real sockets report IPs.
+    if host == "testclient":
+        return True
+    from ipaddress import ip_address
+    try:
+        return ip_address(host).is_loopback
+    except (ValueError, TypeError):
+        return False
+
+
 def create_app(db_path: str | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app):
@@ -325,12 +337,18 @@ def create_app(db_path: str | None = None) -> FastAPI:
     hub = Hub(store)
     @service.middleware("http")
     async def optional_bearer_auth(request: Request, call_next):
-        token = os.getenv("AGENT_BACKEND_TOKEN", "")
-        if token and request.url.path.startswith("/api/"):
+        # Protect every route, including OpenAI/Anthropic-compatible /v1 endpoints.
+        # Only /health remains intentionally public; local no-token development still works.
+        if request.url.path == "/health":
+            return await call_next(request)
+        token = os.getenv("AGENT_BACKEND_TOKEN", "").strip()
+        if token:
             import hmac
             auth = request.headers.get("authorization", "")
             if not hmac.compare_digest(auth, "Bearer " + token):
                 return JSONResponse({"ok": False, "err": "unauthorized"}, status_code=401)
+        elif not _loopback_peer(request.client.host if request.client else ""):
+            return JSONResponse({"ok": False, "err": "backend-token-required-for-network"}, status_code=403)
         return await call_next(request)
     from services.mesh import mount as mount_mesh
     from services.platform import mount as mount_platform
@@ -378,12 +396,15 @@ def create_app(db_path: str | None = None) -> FastAPI:
 
     @service.websocket("/ws")
     async def websocket(socket: WebSocket):
-        token = os.getenv("AGENT_BACKEND_TOKEN", "")
+        token = os.getenv("AGENT_BACKEND_TOKEN", "").strip()
         if token:
             import hmac
             if not hmac.compare_digest(socket.headers.get("authorization", ""), "Bearer " + token):
                 await socket.close(code=4401)
                 return
+        elif not _loopback_peer(socket.client.host if socket.client else ""):
+            await socket.close(code=4403)
+            return
         await socket.accept()
         peer = Peer(socket)
         hub.peers.add(peer)

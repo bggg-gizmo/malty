@@ -17,11 +17,12 @@ import javax.net.ssl.SSLSocketFactory;
  * An outbound relay is required only when the phone has no publicly reachable inbound route.
  */
 public final class OutboundBridge {
-    private final SecurePrefs prefs;private final EmbeddedServer api;private final ExecutorService work=Executors.newFixedThreadPool(3);
+    private final Context context;private final SecurePrefs prefs;private final EmbeddedServer api;private final ExecutorService work=Executors.newFixedThreadPool(3);
     private volatile Socket connection;private volatile boolean active;private volatile OutputStream out;
     private final Set<String> processed=Collections.synchronizedSet(new LinkedHashSet<String>());
     private final SecureRandom random=new SecureRandom();
-    public OutboundBridge(Context ctx,EmbeddedServer server){prefs=new SecurePrefs(ctx);api=server;}
+    private volatile String connectionChallenge="";
+    public OutboundBridge(Context ctx,EmbeddedServer server){context=ctx.getApplicationContext();prefs=new SecurePrefs(ctx);api=server;}
     public void start(){if(active)return;active=true;work.execute(this::run);}
     public void stop(){active=false;Socket c=connection;if(c!=null)try{c.close();}catch(Exception ignored){}prefs.put("bridge-status","offline");}
     public String status(){return prefs.get("bridge-status","offline");}
@@ -37,7 +38,11 @@ public final class OutboundBridge {
         String path=(u.getPath()==null||u.getPath().equals("/")?"/socket.io/":u.getPath());
         if(!path.endsWith("/"))path+="/";
         if(u.getQuery()!=null&&!u.getQuery().isEmpty())query=u.getQuery()+"&"+query;
-        Socket s=SSLSocketFactory.getDefault().createSocket(host,port);connection=s;s.setSoTimeout(70000);
+        Socket s=BridgeTransportSecurity.connect((SSLSocketFactory)SSLSocketFactory.getDefault(),host,port,70000);
+        connection=s;
+        byte[] challengeBytes=new byte[24];random.nextBytes(challengeBytes);
+        connectionChallenge=Base64.encodeToString(challengeBytes,Base64.NO_WRAP|Base64.URL_SAFE);
+        synchronized(processed){processed.clear();}
         InputStream input=s.getInputStream();OutputStream output=s.getOutputStream();byte[] nonce=new byte[16];random.nextBytes(nonce);
         String key=Base64.encodeToString(nonce,Base64.NO_WRAP);String h="GET "+path+"?"+query+" HTTP/1.1\r\nHost: "+host+(port==443?"":":"+port)+"\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: "+key+"\r\nSec-WebSocket-Version: 13\r\n\r\n";
         output.write(h.getBytes(StandardCharsets.US_ASCII));output.flush();ByteArrayOutputStream headers=new ByteArrayOutputStream();byte[] last=new byte[4];int n;
@@ -61,16 +66,41 @@ public final class OutboundBridge {
     }
     private void send(String payload)throws IOException{frame(1,payload.getBytes(StandardCharsets.UTF_8));}
     private void emit(String op,JSONObject data)throws IOException{send("42"+new JSONArray().put(op).put(data));}
+    /** Scope is independently recomputed from the exact authenticated payload. */
+    private static String requiredScope(JSONObject call){
+        if(call.has("op")&&call.has("request"))return "invalid";
+        if(call.has("request")){
+            JSONObject q=call.optJSONObject("request");
+            return q!=null&&q.optString("model").startsWith("moltbook-team")?"moltbook:write":"inference:generate";
+        }
+        String op=call.optString("op"),action=call.optString("action");
+        if(op.equals("ping")||op.equals("team-status")||op.equals("team-capability")
+           ||op.equals("race-list")||op.equals("race-document")||op.equals("roster-discover")
+           ||op.equals("watch")||op.equals("inbox"))return "bridge:read";
+        if(op.equals("mesh")&&(action.equals("inbox")||action.equals("talk")||action.equals("presence")))return "bridge:read";
+        if(op.equals("character-agents")&&(action.equals("list")||action.equals("profile")||action.equals("threads")||action.equals("history")))return "bridge:read";
+        if(op.equals("agent")&&action.equals("status"))return "bridge:read";
+        if(op.equals("moltbook")&&action.equals("route"))return "bridge:read";
+        return op.equals("moltbook")||op.equals("team-dispatch")||op.equals("race-create")
+               ||op.equals("race-send")||op.equals("race-collect")||op.equals("reach")
+               ||op.equals("reach-many")?"moltbook:write":"bridge:write";
+    }
     private void handle(String raw)throws Exception{
         if(raw.equals("2")){send("3");return;}
         if(raw.startsWith("0")){send("40");return;}
-        if(raw.startsWith("40")){prefs.put("bridge-status","registered: "+session());emit("bridge:register",LocalCore.obj("sessionId",session(),"hasChild",true));return;}
+        if(raw.startsWith("40")){prefs.put("bridge-status","registered: "+session());emit("bridge:register",LocalCore.obj("sessionId",session(),"hasChild",true,"authVersion",1,"challenge",connectionChallenge));return;}
         if(!raw.startsWith("42"))return;JSONArray event=new JSONArray(raw.substring(2));String type=event.optString(0);JSONObject message=event.optJSONObject(1);
         if(message==null||!(type.equals("bridge:model_response")||type.equals("bridge:crossframe_out")))return;
-        String requestId=message.optString("requestId");if(requestId.isEmpty())return;
-        synchronized(processed){if(processed.contains(requestId))return;processed.add(requestId);if(processed.size()>500){Iterator<String> it=processed.iterator();for(int i=0;i<100&&it.hasNext();i++){it.next();it.remove();}}}
-        JSONObject payload=message.optJSONObject("payload");if(payload==null)payload=message;
-        final JSONObject call=payload;
+        String requestId=message.optString("requestId"),payloadJson=message.optString("payloadJson","");
+        if(payloadJson.isEmpty()||payloadJson.length()>262144)return;
+        final JSONObject call=new JSONObject(payloadJson);
+        String scope=requiredScope(call);
+        if(!scope.equals(message.optString("scope")))return;
+        if(!BridgeRequestSecurity.verify(RuntimeSecrets.ensure(context),connectionChallenge,session(),
+            message.optString("challenge"),message.optString("sessionId"),requestId,message.optLong("issuedAt",0),
+            scope,payloadJson,message.optString("signature"),System.currentTimeMillis()))return;
+        synchronized(processed){if(processed.contains(requestId))return;processed.add(requestId);
+            if(processed.size()>500){Iterator<String> it=processed.iterator();for(int i=0;i<100&&it.hasNext();i++){it.next();it.remove();}}}
         work.execute(()->{
             try{JSONObject result;
                 if(call.has("op"))result=api.route("POST","/api/bridge/relay",LocalCore.obj("payload",call)).optJSONObject("response");
