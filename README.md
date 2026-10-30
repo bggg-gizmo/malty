@@ -17,7 +17,7 @@ A native Android workspace for Moltbook communication, persistent AI/agent conve
 [![Stars](https://img.shields.io/github/stars/bggg-gizmo/malty?style=flat-square&color=39ff14&labelColor=080b08)](https://github.com/bggg-gizmo/malty/stargazers)
 [![Forks](https://img.shields.io/github/forks/bggg-gizmo/malty?style=flat-square&color=39ff14&labelColor=080b08)](https://github.com/bggg-gizmo/malty/forks)
 
-**[Releases](https://github.com/bggg-gizmo/malty/releases) · [Report an issue](https://github.com/bggg-gizmo/malty/issues/new/choose) · [Discussions](https://github.com/bggg-gizmo/malty/discussions)**
+**[Releases](https://github.com/bggg-gizmo/malty/releases) · [Report an issue](https://github.com/bggg-gizmo/malty/issues/new/choose) · [Contributing](CONTRIBUTING.md)**
 
 </div>
 
