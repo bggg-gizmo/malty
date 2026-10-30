@@ -35,3 +35,9 @@ This is an Android *testing build*. No device or live external-service certifica
 - Existing `main` policy JSON includes a PR requirement that conflicts with the current direct-to-`main`, no-PR publishing workflow. Both public rulesets remain inactive; no protection settings were changed.
 - A native GitHub Releases prerelease still requires a release-creation capability unavailable through the connected GitHub Git Data integration. The public signed APK remains directly downloadable in `downloads/v0.9.2/`.
 - Physical device execution, authenticated live services, and complete recovered-plugin parity have not been certified. No GitHub Actions, force pushes, or unauthorized branches were used.
+
+## 2026-10-29 — checkpoint 5 validation and direct-main policy alignment
+
+The signed v0.9.2 APK remains present on public `main` with the verified original blob SHA `25ad469fe17db0a7cac26597d2afb8b22ae52403` and SHA-256 `a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e`. The native GitHub Releases API still lists no releases; the public repository lists no active rulesets. A local, separately downloadable release publishing/verification tool and regression tests were prepared, with 16/16 local unit tests passing. No actual GitHub Release creation or physical-device/authenticated-service certification is claimed.
+
+The stored `malty-main-branch-ruleset.json` previously required pull requests and conflicted with the authorized direct-`main` workflow. The pending ruleset configuration now disallows deletions, non-fast-forward updates and merge commits while allowing fast-forward direct publishing. This is a change to an **inactive ruleset definition only**; the live remote rulesets still need explicitly authorized activation. No GitHub Actions or paid workflows were executed.
