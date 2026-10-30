@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 820" role="img" aria-labelledby="diagram-title diagram-desc">
+  <title id="diagram-title">Malty — Local-first Android architecture</title>
+  <desc id="diagram-desc">Three connected layers. Malty Android app contains the user interface, Studio, and operations. These use the device-owned core, which contains HTTP, WebSocket, SQLite, and protected Android credentials. Optional outbound integrations include Moltbook, inference providers, and Bridge. Outbound integration is opt-in.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#081412"/><stop offset="0.5" stop-color="#0A101B"/><stop offset="1" stop-color="#120C20"/></linearGradient>
+    <radialGradient id="halo1"><stop stop-color="#64F6AC" stop-opacity=".20"/><stop offset="1" stop-color="#64F6AC" stop-opacity="0"/></radialGradient>
+    <radialGradient id="halo2"><stop stop-color="#AA8CFF" stop-opacity=".19"/><stop offset="1" stop-color="#AA8CFF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="one" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#182D2B"/><stop offset="1" stop-color="#101F25"/></linearGradient>
+    <linearGradient id="two" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#15293A"/><stop offset="1" stop-color="#141D32"/></linearGradient>
+    <linearGradient id="three" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#24203D"/><stop offset="1" stop-color="#18172D"/></linearGradient>
+    <linearGradient id="link" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#66EBAF"/><stop offset=".5" stop-color="#54CFE3"/><stop offset="1" stop-color="#B39BFF"/></linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M 36 0 L 0 0 0 36" fill="none" stroke="#9EDBBF" stroke-opacity=".055" stroke-width="1"/></pattern>
+    <filter id="shadow" x="-15%" y="-40%" width="130%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="11" result="blur"/><feOffset in="blur" dy="9" result="shift"/><feComponentTransfer in="shift" result="alpha"><feFuncA type="linear" slope=".34"/></feComponentTransfer><feMerge><feMergeNode in="alpha"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="4"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto"><path d="M1 1 L11 6 L1 11 Z" fill="#6FCFDB"/></marker>
+  </defs>
+  <rect width="1200" height="820" rx="30" fill="url(#bg)"/>
+  <rect width="1200" height="820" rx="30" fill="url(#grid)"/>
+  <ellipse cx="190" cy="185" rx="370" ry="280" fill="url(#halo1)"/>
+  <ellipse cx="1050" cy="720" rx="400" ry="340" fill="url(#halo2)"/>
+  <rect x="24" y="24" width="1152" height="772" rx="23" stroke="#B5E9D7" stroke-opacity=".18" fill="none"/>
+
+  <g font-family="Inter, DejaVu Sans, Arial, sans-serif">
+    <g transform="translate(70 64)">
+      <rect width="45" height="45" rx="12" fill="#68F2AC" fill-opacity=".15" stroke="#75F3B2" stroke-opacity=".55"/>
+      <path d="M 12 29 L 12 16 L 20 25 L 27 16 L 27 29 M 33 16 L 33 29" fill="none" stroke="#8CF9BF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="129" y="81" font-size="28" font-weight="800" fill="#ECFFF6" letter-spacing="5">MALTY</text>
+    <text x="129" y="103" font-size="13.5" fill="#9AB2B7" letter-spacing="2">LOCAL-FIRST ANDROID ARCHITECTURE</text>
+    <rect x="923" y="72" width="206" height="34" rx="17" fill="#69F1B6" fill-opacity=".09" stroke="#69F1B6" stroke-opacity=".42"/>
+    <circle cx="946" cy="89" r="5" fill="#83F5B9"/>
+    <text x="963" y="94" font-size="14" font-weight="700" fill="#BDFCDF">DEVICE-OWNED CORE</text>
+
+    <!-- Card 1 -->
+    <rect x="84" y="152" width="1032" height="164" rx="22" fill="url(#one)" stroke="#65EBA7" stroke-opacity=".66" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="84" y="152" width="7" height="164" rx="3.5" fill="#70F4B3"/>
+    <rect x="117" y="177" width="111" height="111" rx="21" fill="#71EEAB" fill-opacity=".10" stroke="#70EBB0" stroke-opacity=".26"/>
+    <rect x="150" y="193" width="45" height="77" rx="9" stroke="#89F8BE" stroke-width="3" fill="none"/>
+    <path d="M158 205 H187 M159 258 H187" stroke="#89F8BE" stroke-opacity=".65" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="172.5" cy="263" r="2.5" fill="#89F8BE"/>
+    <rect x="159" y="213" width="27" height="33" rx="4" fill="#72EFAD" fill-opacity=".15"/>
+    <text x="255" y="198" font-size="14" font-weight="700" letter-spacing="2.1" fill="#76F4B4">01 / APPLICATION</text>
+    <text x="255" y="238" font-size="34" font-weight="800" fill="#F0FFF8">Malty Android app</text>
+    <text x="255" y="272" font-size="18" fill="#B8D8CE">Conversations and tools, directly on your phone</text>
+    <g font-size="14.5" font-weight="700" text-anchor="middle">
+      <rect x="813" y="188" width="132" height="35" rx="11" fill="#75F1B4" fill-opacity=".11" stroke="#83F4BE" stroke-opacity=".31"/><text x="879" y="211" fill="#C9FDE1">UI</text>
+      <rect x="958" y="188" width="125" height="35" rx="11" fill="#75F1B4" fill-opacity=".11" stroke="#83F4BE" stroke-opacity=".31"/><text x="1020" y="211" fill="#C9FDE1">Studio</text>
+      <rect x="813" y="236" width="270" height="35" rx="11" fill="#75F1B4" fill-opacity=".11" stroke="#83F4BE" stroke-opacity=".31"/><text x="948" y="259" fill="#C9FDE1">Operations &amp; diagnostics</text>
+    </g>
+
+    <!-- connector 1 -->
+    <path d="M600 317 V356" stroke="url(#link)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="600" cy="336" r="12" fill="#0F252C" stroke="#75D7D2" stroke-width="2"/>
+    <path d="M595 335 l5 5 5-5" fill="none" stroke="#92F9ED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Card 2 -->
+    <rect x="84" y="356" width="1032" height="170" rx="22" fill="url(#two)" stroke="#61CFE8" stroke-opacity=".76" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="84" y="356" width="7" height="170" rx="3.5" fill="#6CD5EF"/>
+    <rect x="117" y="386" width="111" height="111" rx="21" fill="#64D1E9" fill-opacity=".10" stroke="#77D7EC" stroke-opacity=".29"/>
+    <rect x="142" y="407" width="62" height="67" rx="10" stroke="#8BE6FA" stroke-width="3" fill="none"/>
+    <path d="M150 418 h46 M150 429 h46 M150 441 h46" stroke="#8BE6FA" stroke-width="2" opacity=".7"/>
+    <circle cx="154" cy="457" r="3" fill="#8BE6FA"/><circle cx="166" cy="457" r="3" fill="#8BE6FA"/><circle cx="178" cy="457" r="3" fill="#8BE6FA"/>
+    <text x="255" y="399" font-size="14" font-weight="700" letter-spacing="2.1" fill="#80E2F2">02 / LOCAL RUNTIME</text>
+    <text x="255" y="438" font-size="32" font-weight="800" fill="#F2FAFF">Device-owned core</text>
+    <text x="255" y="471" font-size="18" fill="#B9D5E5">Private data and services remain on-device</text>
+    <g font-size="14" font-weight="700" text-anchor="middle">
+      <rect x="791" y="384" width="137" height="42" rx="12" fill="#76CFEE" fill-opacity=".10" stroke="#76D7F3" stroke-opacity=".31"/><text x="859.5" y="410" fill="#D3F4FF">HTTP API</text>
+      <rect x="939" y="384" width="144" height="42" rx="12" fill="#76CFEE" fill-opacity=".10" stroke="#76D7F3" stroke-opacity=".31"/><text x="1011" y="410" fill="#D3F4FF">WebSocket</text>
+      <rect x="791" y="437" width="137" height="42" rx="12" fill="#76CFEE" fill-opacity=".10" stroke="#76D7F3" stroke-opacity=".31"/><text x="859.5" y="463" fill="#D3F4FF">SQLite</text>
+      <rect x="939" y="437" width="144" height="42" rx="12" fill="#76CFEE" fill-opacity=".10" stroke="#76D7F3" stroke-opacity=".31"/><text x="1011" y="463" fill="#D3F4FF">Keystore</text>
+    </g>
+
+    <!-- connector 2 -->
+    <path d="M600 526 V567" stroke="url(#link)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="600" cy="546" r="12" fill="#171F33" stroke="#AA97F4" stroke-width="2"/>
+    <path d="M595 545 l5 5 5-5" fill="none" stroke="#CFBFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Card 3 -->
+    <rect x="84" y="567" width="1032" height="165" rx="22" fill="url(#three)" stroke="#AF9CF4" stroke-opacity=".69" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="84" y="567" width="7" height="165" rx="3.5" fill="#BBA4FF"/>
+    <rect x="117" y="593" width="111" height="111" rx="21" fill="#AA9AFF" fill-opacity=".10" stroke="#AFA4FF" stroke-opacity=".27"/>
+    <circle cx="172" cy="649" r="29" stroke="#D0C0FF" stroke-width="3" fill="none"/>
+    <ellipse cx="172" cy="649" rx="12" ry="29" stroke="#D0C0FF" stroke-width="2" fill="none"/>
+    <path d="M144 648 H201 M148 637 H196 M148 661 H196" stroke="#D0C0FF" stroke-width="2" fill="none"/>
+    <text x="255" y="613" font-size="14" font-weight="700" letter-spacing="2.1" fill="#C3ACFF">03 / EXTERNAL CONNECTIONS</text>
+    <text x="255" y="652" font-size="32" font-weight="800" fill="#F8F4FF">Optional integrations</text>
+    <text x="255" y="686" font-size="18" fill="#D6C9ED">External services connect only when configured</text>
+    <g font-size="14.5" font-weight="700" text-anchor="middle">
+      <rect x="792" y="593" width="138" height="44" rx="12" fill="#AF9FFB" fill-opacity=".11" stroke="#BBACFF" stroke-opacity=".29"/><text x="861" y="621" fill="#E6DBFF">Moltbook</text>
+      <rect x="939" y="593" width="144" height="44" rx="12" fill="#AF9FFB" fill-opacity=".11" stroke="#BBACFF" stroke-opacity=".29"/><text x="1011" y="621" fill="#E6DBFF">Inference</text>
+      <rect x="792" y="647" width="291" height="44" rx="12" fill="#AF9FFB" fill-opacity=".11" stroke="#BBACFF" stroke-opacity=".29"/><text x="938" y="675" fill="#E6DBFF">Outbound Bridge</text>
+    </g>
+    <text x="88" y="772" font-size="13.5" fill="#8FA5B5">DESIGNED FOR LOCAL CONTROL</text>
+    <text x="1111" y="772" text-anchor="end" font-size="13.5" fill="#A99DC5">NETWORK FEATURES ARE OPT-IN</text>
+  </g>
+</svg>

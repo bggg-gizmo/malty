@@ -50,6 +50,12 @@ File    Malty-signed-v0.9.2.apk
 
 > **Testing release, not production-certified.** Host regression tests and APK signature verification have passed; physical-device behavior, authenticated live integrations and full original third-party plugin parity still need independent testing. The [GitHub Releases page](https://github.com/bggg-gizmo/malty/releases) does not yet contain a native prerelease entry; use the repository download above.
 
+### Keep an earlier Malty version with Roll Backer
+
+Already installed **Malty v0.9.2** and want to preserve that version before testing a newer build? Use **[Roll Backer by Background Gremlin Group](https://github.com/bggg-gizmo/rollback)** to archive the exact APK package set you already have installed. In Roll Backer, open **Installed Apps → Malty → Snapshot now** (or choose **Snapshot all installed apps now** for a broader baseline); verify the captured version in **Vault → Release History**. Roll Backer can later submit a verified saved release for reinstall or rollback, subject to Android's user confirmation and package-manager restrictions.
+
+**Important: Roll Backer saves APKs, not Malty's private app data.** Uninstalling Malty normally deletes its private database, accounts and settings. Back up any local data separately before uninstalling. Roll Backer **cannot bypass Android signing-certificate or downgrade rules**. In particular, the development-signed v0.9.3 testing APK is signed differently from the original v0.9.2 build and **cannot be installed over v0.9.2 as a data-preserving update**. An in-place update requires a build signed with the same authorized release signing identity.
+
 Installing an APK signed by a different certificate over an existing app will fail. Back up local records before changing installations or identities.
 
 ## Build it yourself — complete source
@@ -92,22 +98,9 @@ The separate `malty-dev` integration repository remains private; public contribu
 
 ## How Malty works
 
-```text
-                   ┌──────────────────────────────┐
-                   │    MALTY — ANDROID APP       │
-                   │  UI / STUDIO / OPERATIONS    │
-                   └────────────┬─────────────────┘
-                                │
-               ┌────────────────▼────────────────┐
-               │ Device-owned HTTP + WebSocket   │
-               │ SQLite + encrypted credentials │
-               └────────────────┬────────────────┘
-                                │
-                ┌───────────────┴──────────────────┐
-                │ Optional outbound integrations  │
-                │ Moltbook · Inference · Bridge  │
-                └──────────────────────────────────┘
-```
+<p align="center">
+  <img src="assets/malty-architecture.svg" alt="Architecture diagram showing Malty's Android UI and Studio linked to a device-owned HTTP, WebSocket, SQLite and Android Keystore core, with optional outbound connections to Moltbook, inference providers and Bridge." width="1100">
+</p>
 
 Moltbook authentication is handled through encrypted Android credential storage. The local service binds to loopback by default. LAN sharing is optional, and **the HTTP-only LAN listener must not be exposed directly to the public internet**. Remote providers, Perchance inference and external relays require availability and their respective credentials or interactive verification.
 
