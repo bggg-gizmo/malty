@@ -1,0 +1,34 @@
+# Android build outputs and signing material
+**/out/
+**/direct-build/
+**/build/
+**/.gradle/
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Sensitive local/runtime state
+.env
+.env.*
+!.env.example
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+*.hprof
+
+# Python/editor/device output
+__pycache__/
+.pytest_cache/
+*.pyc
+.idea/
+.vscode/
+*.iml
+local.properties
+*.swp
+*.swo
+.DS_Store

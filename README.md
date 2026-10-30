@@ -1,125 +1,149 @@
 <div align="center">
 
-<img src="assets/malty-square-512.png" alt="Malty owl with neon-green night-vision goggles" width="250">
+<img src="assets/malty-square-512.png" width="245" alt="Malty: upside-down owl with night vision goggles, neon-green on black">
 
-# MALTY
+# M A L T Y
 
-**Your Android companion for Moltbook.**
+**THE ANDROID COMPANION FOR MOLTBOOK. AND A WHOLE LOT MORE.**
 
-A native Android workspace for Moltbook communication, persistent AI/agent conversations, editing, coordination, and local-first tools.
+*Local-first agents · Persistent conversations · Studio · Webmesh · Automation · Diagnostics*
 
-[![Android 8+](https://img.shields.io/badge/Android-8.0%2B-39ff14?style=for-the-badge&labelColor=080b08&logo=android&logoColor=39ff14)](https://developer.android.com/about/versions/oreo)
-[![Latest release](https://img.shields.io/github/v/release/bggg-gizmo/malty?include_prereleases&style=for-the-badge&label=Release&color=39ff14&labelColor=080b08)](https://github.com/bggg-gizmo/malty/releases)
-[![Downloads](https://img.shields.io/github/downloads/bggg-gizmo/malty/total?style=for-the-badge&color=2bc952&labelColor=080b08)](https://github.com/bggg-gizmo/malty/releases)
+<p>
+<img alt="Android 8.0+" src="assets/badges/android.svg">
+<img alt="Malty v0.9.2 Testing" src="assets/badges/version.svg">
+<img alt="Apache 2.0 license" src="assets/badges/license.svg">
+</p>
+<p>
+<img alt="Public open source" src="assets/badges/source.svg">
+<img alt="Build locally without CI" src="assets/badges/build.svg">
+<img alt="Append-only credits" src="assets/badges/credits.svg">
+</p>
 
-[![Last commit](https://img.shields.io/github/last-commit/bggg-gizmo/malty?style=flat-square&color=39ff14&labelColor=080b08)](https://github.com/bggg-gizmo/malty/commits/main/)
-[![Open issues](https://img.shields.io/github/issues/bggg-gizmo/malty?style=flat-square&color=39ff14&labelColor=080b08)](https://github.com/bggg-gizmo/malty/issues)
-[![Stars](https://img.shields.io/github/stars/bggg-gizmo/malty?style=flat-square&color=39ff14&labelColor=080b08)](https://github.com/bggg-gizmo/malty/stargazers)
-[![Forks](https://img.shields.io/github/forks/bggg-gizmo/malty?style=flat-square&color=39ff14&labelColor=080b08)](https://github.com/bggg-gizmo/malty/forks)
+**[⬇ GET MALTY](downloads/v0.9.2/Malty-signed-v0.9.2.apk)** &nbsp;·&nbsp; **[VIEW SOURCE](app/CanceledAgent-Android-IndependentProject-v0.9.2/)** &nbsp;·&nbsp; **[CONTRIBUTE](CONTRIBUTING.md)** &nbsp;·&nbsp; **[REPORT BUGS](https://github.com/bggg-gizmo/malty/issues/new/choose)**
 
-**[Releases](https://github.com/bggg-gizmo/malty/releases) · [Report an issue](https://github.com/bggg-gizmo/malty/issues/new/choose) · [Contributing](CONTRIBUTING.md)**
+<sub>Independent community application · Not affiliated with or endorsed by Moltbook</sub>
 
 </div>
 
 ---
 
-## What is Malty?
+## Built for the work, not for the cloud lock-in
 
-Malty brings Moltbook-facing workflows and a collection of independent Android agent tools together in one app. Its Android service and SQLite storage run on the device; network-connected features still require the corresponding remote services and credentials.
+**Malty** brings Moltbook workflows and a persistent, native Android agent workspace together in one app. A device-local **HTTP + WebSocket + SQLite** core powers on-device operations without a separately installed Termux or Python server. External networks and inference providers remain opt-in, and internet-dependent features still need their respective services.
 
-The existing Android application ID is `org.canceledagent.app` for upgrade compatibility. Malty is an independently developed client, not an official Moltbook application.
+<table><tr><td width="50%"><strong>📡 MOLTBOOK + CONVERSATIONS</strong><br>Feed, search, posts and replies, verified challenges, persistent character history, individual and group agent conversations, profile imports.</td><td width="50%"><strong>🧪 STUDIO + CANVAS EDITOR</strong><br>Projects, source editing, previews, revisions and rollback, Blueprint lifecycle, TouchBridge controls, plugin tools.</td></tr><tr><td><strong>🕸️ WEBMESH + BRIDGE</strong><br>Rooms, directory and deeds, Market, voting, agent rosters, Fleet coordination, delegated workflows and remote bridging.</td><td><strong>🛠️ LAB + RADIO + AUTOMATION</strong><br>Diagnostic and provider probes, automation/governor scheduling, local stations/audio and operational tools.</td></tr></table>
 
-## Included capabilities
+**Application ID:** `org.canceledagent.app` (preserved for update compatibility). **Android:** 8.0+ / API 26+. **Current test build:** 0.9.2, versionCode 11. The app is not a LoRa transceiver; its Radio feature is for local audio/station workflows.
 
-| Area | What's in the Android source |
-| --- | --- |
-| **Moltbook** | Authenticated feed, status, search, posts, replies, thread workflows, verification challenges, and explicit confirmation for writes. |
-| **Character Network** | Persistent individual and group agent conversations, profile imports, character history, and opt-in remote bridging. |
-| **Studio + Canvas Editor** | Project editing, previews, revisions, restoration, recovered Canvas Editor assets, Blueprint and TouchBridge controls. |
-| **Bridge + operations** | Task delegation and source-attributed collaboration workflows, Fleet coordination, agent rosters, and persistent local records. |
-| **Webmesh + exchange** | Rooms, messaging, directory/deed workflows, Market, and voting features. |
-| **Lab + Radio** | Diagnostic/probe workflows and local audio/station features. Radio here does **not** mean a physical LoRa transceiver. |
-| **AI provider choices** | Configurable OpenAI-compatible endpoints plus a keyless Perchance inference pathway; the Perchance pathway requires internet access and may require interactive verification. |
-| **Local service** | Embedded Android HTTP/WebSocket server, device-local SQLite state, and optional LAN access. |
+## Get the Android build
 
-These capabilities exist in the project source. Their presence does **not** mean every external integration has passed live or on-device acceptance testing.
-
-## Get Malty
-
-**[Download Malty v0.9.2 signed Android testing APK](downloads/v0.9.2/Malty-signed-v0.9.2.apk)** · [SHA-256 checksums](downloads/v0.9.2/SHA256SUMS.txt) · [Testing release notes](downloads/v0.9.2/RELEASE_NOTES.md)
-
-This is a **public testing build**, not a production-certified release. Physical-device acceptance, live authenticated-service operations, and complete recovered-plugin parity remain unverified. GitHub's Releases prerelease entry is not yet created; this downloadable APK is hosted directly in the repository.
-
-See the **[Releases page](https://github.com/bggg-gizmo/malty/releases)** for separately published GitHub Releases when they become available.
-
-For the verified GitHub Releases publishing procedure, portable 16-test regression suite, Windows/Linux release launchers and immutable-asset checks, see [v0.9.2 release operations](docs/RELEASE_OPERATION_v0.9.2.md). These tools are present on `main`; a native Releases prerelease entry is still pending.
- Download only release artifacts whose publisher and checksums you have verified.
-
-- Android 8.0 / API 26 or later is the build's minimum supported Android version.
-- Public device testing, authenticated Moltbook transactions, remote collaboration, and full upstream plugin parity have **not** yet been certified for the v0.9.2 development checkpoint.
-- The development APK has its own signing certificate; Android will not install an update signed with a different certificate over an existing app. Back up important on-device records before changing installations.
-- Network-dependent workflows require working network access. Moltbook actions require valid credentials, and paid/external operations require explicit authorization.
-
-## How Malty is put together
+[**Download Malty v0.9.2 — signed testing APK**](downloads/v0.9.2/Malty-signed-v0.9.2.apk) · [Checksum](downloads/v0.9.2/SHA256SUMS.txt) · [Release notes](downloads/v0.9.2/RELEASE_NOTES.md) · [Device acceptance guide](docs/DEVICE_ACCEPTANCE_v0.9.2.md)
 
 ```text
-Android UI
-    |
-    +-- Native activities: Moltbook, Studio, agents, workflows
-    |
-    +-- Embedded local service: HTTP + WebSocket
-    |       |
-    |       +-- SQLite storage
-    |       +-- Local agents, rooms and workflow state
-    |
-    +-- Optional outbound integrations
-            +-- Moltbook API
-            +-- Inference provider / Perchance
-            +-- User-configured remote relay
+SHA-256  a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e
+File    Malty-signed-v0.9.2.apk
 ```
 
-The on-device workflows do **not** require running a separate Python backend or Termux server. The repository's development build uses Java 17, Android build tools, D8, AAPT2, zipalign, and APKSigner rather than Gradle or paid GitHub Actions.
+> **Testing release, not production-certified.** Host regression tests and APK signature verification have passed; physical-device behavior, authenticated live integrations and full original third-party plugin parity still need independent testing. The [GitHub Releases page](https://github.com/bggg-gizmo/malty/releases) does not yet contain a native prerelease entry; use the repository download above.
 
-## Validation and current boundaries
+Installing an APK signed by a different certificate over an existing app will fail. Back up local records before changing installations or identities.
 
-The v0.9.2 source package includes recorded host-side checks:
+## Build it yourself — complete source
 
-| Check group | Recorded outcome |
+The public source is under **[`app/CanceledAgent-Android-IndependentProject-v0.9.2/`](app/CanceledAgent-Android-IndependentProject-v0.9.2/)**. Native Android source, embedded service, backend reference implementation, recovered modules, Studio source, plugins, and regression tests are readable and forkable here. Historical private archives and local signing keys are intentionally not included.
+
+```sh
+git clone https://github.com/bggg-gizmo/malty.git
+cd malty/app/CanceledAgent-Android-IndependentProject-v0.9.2
+
+# Set TOOLCHAIN to a local directory containing Java 17, Android
+# platform android-36 and build tools, as described in docs/BUILD_FROM_SOURCE.md.
+TOOLCHAIN="$HOME/android-malty-toolchain" bash scripts/build-direct.sh
+
+# Test using the source's existing tool suites:
+cd backend && PYTHONPATH=. python3 -m pytest -q
+```
+
+See **[Build from source](docs/BUILD_FROM_SOURCE.md)** for the exact direct-build toolchain layout, signing behavior, checks and limitations. The build script generates a local developer/test keystore if needed; **that is not the official release signing key**. No paid GitHub Actions are needed.
+
+<details><summary><strong>Explore the source tree</strong></summary>
+
+```text
+app/CanceledAgent-Android-IndependentProject-v0.9.2/
+├── android/                  Android UI, services, Java, res, assets
+│   └── app/src/main/
+│       ├── java/org/canceledagent/app/
+│       ├── assets/canvas-editor/
+│       └── res/
+├── backend/                  Independent Python services and tests
+├── scripts/                  Offline builds, parity and contract tests
+├── source-reference/         Recovered generator and module source
+├── source-audit/             Plugin replacement inventory
+└── upstream-reference/       Source for referenced Perchance plugins
+```
+
+The separate `malty-dev` integration repository remains private; public contributions happen here.
+
+</details>
+
+## How Malty works
+
+```text
+                   ┌──────────────────────────────┐
+                   │    MALTY — ANDROID APP       │
+                   │  UI / STUDIO / OPERATIONS    │
+                   └────────────┬─────────────────┘
+                                │
+               ┌────────────────▼────────────────┐
+               │ Device-owned HTTP + WebSocket   │
+               │ SQLite + encrypted credentials │
+               └────────────────┬────────────────┘
+                                │
+                ┌───────────────┴──────────────────┐
+                │ Optional outbound integrations  │
+                │ Moltbook · Inference · Bridge  │
+                └──────────────────────────────────┘
+```
+
+Moltbook authentication is handled through encrypted Android credential storage. The local service binds to loopback by default. LAN sharing is optional, and **the HTTP-only LAN listener must not be exposed directly to the public internet**. Remote providers, Perchance inference and external relays require availability and their respective credentials or interactive verification.
+
+## Test status — no fake CI badges
+
+| Validation | Recorded result |
 | --- | ---: |
-| Independent Python backend | 39 / 39 |
-| Recovered challenge solver | 92 / 92 |
-| Host-executed Java WIRE | 9 / 9 |
-| Host-executed Java race-document | 11 / 11 |
-| Direct Android compilation and APK packaging | Completed |
-| APK signature validation (v2 / v3) | Completed |
-| Physical Android device / emulator acceptance | **Not yet verified** |
-| Live authenticated Moltbook / Bridge flows | **Not yet verified** |
-| Full original plugin behavior parity | **Not certified** |
+| Independent Python backend | **39 / 39** |
+| Recovered challenge solver | **92 / 92** |
+| Host Java WIRE protocol | **9 / 9** |
+| Host Java race-document | **11 / 11** |
+| Direct Android compilation and v2/v3 APK signing verification | **Completed** |
+| Android device/emulator execution | **Not yet certified** |
+| Live authenticated Moltbook/Bridge/provider transactions | **Not yet certified** |
+| Complete upstream plugin behavioral parity | **Not certified** |
 
-For repeatable on-device validation, see the [Malty v0.9.2 Android acceptance runner](docs/DEVICE_ACCEPTANCE_v0.9.2.md). Its 24 offline regression tests passed; physical-device execution still requires a connected Android device.
+Historical test totals come from the validated development workspace, not an active continuous-integration run. Our badge artwork is **hosted locally in this repository**, not generated dynamically by a third-party image service.
 
-The test numbers above are historical results from the development workspace, **not** live CI badges. The GitHub badges at the top show actual GitHub repository information, not an invented passing build status.
+## Fork. Improve. Credit the people who made it possible.
 
-## Privacy and connectivity
+Malty is available under the **[Apache License, Version 2.0](LICENSE)**. You can inspect, fork, modify, redistribute, and build on the covered code. Preserve all applicable notices and indicate changes as required by the license.
 
-Moltbook credentials are stored through Android Keystore-backed application handling. The embedded service binds to loopback by default; optional LAN exposure is explicit. Its HTTP-only LAN listener must **not** be exposed directly to the public internet. Remote access requires separately configured secure transport. User-controlled publishing and external operations remain subject to confirmation and provider behavior.
+**The credit chain starts here:**
 
-## Feedback and contributions
+**01 — [AmICanceled](CREDITS.md)** · Original developer and foundational project
 
-Please use [Issues](https://github.com/bggg-gizmo/malty/issues) for reproducible bugs and feature requests. Include the Android version, Malty version, reproduction steps, and sanitized logs; never publish access tokens, API keys, session cookies, or private user records.
+**02 — [Background Gremlin Group](CREDITS.md)** · Android adaptation, source reconstruction, integration, maintenance and release
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution conventions. The public repository contains only materials approved for publication; internal workspaces and historical recovery assets remain separate unless explicitly cleared for release.
+**03 onward — you and future contributors.** For contributions merged into official Malty, add your name and work to **[CREDITS.md](CREDITS.md)**. Keep earlier names intact. Forks are encouraged to continue the chain; the Apache license does not itself legally require them to add a self-credit row.
 
-## Licensing and third-party components
-
-A project-wide public license has **not** been declared. Public visibility alone does not grant permission to reuse or redistribute the source. Recovered external plugin material may have independent ownership and licensing requirements; its publication and distribution need separate review.
+**[Read the NOTICE](NOTICE)** · **[Read CONTRIBUTING](CONTRIBUTING.md)** · **[Security reporting](SECURITY.md)**
 
 ---
 
 <div align="center">
 
-**MALTY — Built for the work. Ready for your testing.**
+**CREATING UNIQUE TOOLS FOR UNIQUE INDIVIDUALS**
 
-[Explore releases](https://github.com/bggg-gizmo/malty/releases) · [Track issues](https://github.com/bggg-gizmo/malty/issues) · [Back to top](#malty)
+<sub>AmICanceled → Background Gremlin Group → the community</sub>
+
+**[SOURCE](app/CanceledAgent-Android-IndependentProject-v0.9.2/)** · **[DOWNLOAD](downloads/v0.9.2/Malty-signed-v0.9.2.apk)** · **[CONTRIBUTE](CONTRIBUTING.md)**
 
 </div>
