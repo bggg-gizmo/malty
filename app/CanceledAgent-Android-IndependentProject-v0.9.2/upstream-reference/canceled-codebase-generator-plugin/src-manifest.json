@@ -1,0 +1,182 @@
+{
+    "README.md":  {
+                      "key":  "ea7985384be905f01bbbab979b3bc2ea.txt",
+                      "size":  13441
+                  },
+    "canvas-editor/editor-worker.js":  {
+                                           "key":  "fd14e4322b7446ce01d49046fa6e9b9d.js",
+                                           "size":  35878
+                                       },
+    "canvas-editor/worker-source.js":  {
+                                           "key":  "6d2fb9fea6ad56e45a68228bcaabb438.js",
+                                           "size":  736
+                                       },
+    "canvas-editor/canvas-editor.js":  {
+                                           "key":  "6dc63ac49645428f4e469ea23cfad8bb.js",
+                                           "size":  13561
+                                       },
+    "canvas-editor/floating-window.js":  {
+                                             "key":  "8a2f93dbf9ee80c2777acbc830985e99.js",
+                                             "size":  10422
+                                         },
+    "canvas-editor/index.js":  {
+                                   "key":  "b9db0b6d23ea94706e04b03cb6182b82.js",
+                                   "size":  7779
+                               },
+    "canvas-editor/BUILD.md":  {
+                                   "key":  "4f6c083eedc5a962a298e315a1827b5e.txt",
+                                   "size":  8455
+                               },
+    "canvas-editor/diff.js":  {
+                                  "key":  "426a3ccc4d00efcd30f715916fcf0565.js",
+                                  "size":  3231
+                              },
+    "canvas-editor/git.js":  {
+                                 "key":  "8b341f7597bdd4f235c54150804421a1.js",
+                                 "size":  7550
+                             },
+    "canvas-editor/project.js":  {
+                                     "key":  "c97daa3d8441234c97fa771a08414d6e.js",
+                                     "size":  11466
+                                 },
+    "canvas-editor/project-panel.js":  {
+                                           "key":  "70f5dee74bbb2cef8c524c78b3b32f06.js",
+                                           "size":  16485
+                                       },
+    "canvas-editor/store.js":  {
+                                   "key":  "3a0a099c89c355e0a6e9b1b4ba6eb6f7.js",
+                                   "size":  2648
+                               },
+    "SPEC.md":  {
+                    "key":  "492d5951c65b2e02de8d5bba7b088d4e.txt",
+                    "size":  1818
+                },
+    "TODO.md":  {
+                    "key":  "7f13e7050f2232c1ae0ebd688e727a8d.txt",
+                    "size":  638
+                },
+    "core-design-principles-latest.md":  {
+                                             "key":  "adde28be53451db1dc5fbec3bfd162af.txt",
+                                             "size":  4592
+                                         },
+    "task-list.md":  {
+                         "key":  "1ce89867b1ae7c3beb65181cfc8f56b7.txt",
+                         "size":  2193
+                     },
+    "version-history.md":  {
+                               "key":  "834a8f0e3a3c5b95a97dd0125a8d929d.txt",
+                               "size":  5375
+                           },
+    "Conversation-History/chat-record-00_2026-09-24.md":  {
+                                                              "key":  "bb40c18e26a5eaa9ed575d30ef61ced2.txt",
+                                                              "size":  1684
+                                                          },
+    "Conversation-History/Archive/00-raw-transcript-2026-09-24-01.txt":  {
+                                                                             "key":  "60f730a1a8d8484f14416327e6155975.txt",
+                                                                             "size":  12
+                                                                         },
+    "Core-Design-Principles/core-design-principles-v01.00.md":  {
+                                                                    "key":  "0a28f85c665e1ce023b3f14b49bb1261.txt",
+                                                                    "size":  4158
+                                                                },
+    "Core-Design-Principles/core-design-principles-v01.01.md":  {
+                                                                    "key":  "34111b32e9b77d9a77d29c81f96fe781.txt",
+                                                                    "size":  4424
+                                                                },
+    "plugin-tools.js":  {
+                            "key":  "4f83cc144171b393edfe32f148234b67.js",
+                            "size":  22673
+                        },
+    "plugins/index.json":  {
+                               "key":  "2d38b82798f5fb1c577fa9c4d00b3686.json",
+                               "size":  122483
+                           },
+    "Core-Design-Principles/core-design-principles-v01.02.md":  {
+                                                                    "key":  "ccdaf83d1d9ed3faf3c70f8ea4694536.txt",
+                                                                    "size":  4355
+                                                                },
+    "Core-Design-Principles/core-design-principles-v01.03.md":  {
+                                                                    "key":  "f74f7a6082cbf0e683fd5e8185d08705.txt",
+                                                                    "size":  4454
+                                                                },
+    "Core-Design-Principles/core-design-principles-v01.04.md":  {
+                                                                    "key":  "adde28be53451db1dc5fbec3bfd162af.txt",
+                                                                    "size":  4592
+                                                                },
+    "ISSUES_FIXES.md":  {
+                            "key":  "73b6e850ffa34c61134d8f03d9f7aa0e.txt",
+                            "size":  4168
+                        },
+    "CODE_REFERENCE.md":  {
+                              "key":  "f461c495481157d86b56815f51d47e57.txt",
+                              "size":  4304
+                          },
+    "treeshake-worklist.md":  {
+                                  "key":  "64413d81c64fac0937e27256b3fa675e.txt",
+                                  "size":  1102
+                              },
+    "MEMORY_CUBE.md":  {
+                           "key":  "4eb7d9d76ee685e22d1e3d3aa2dfc366.txt",
+                           "size":  4954
+                       },
+    "tests/workspace-suite.js":  {
+                                     "key":  "d8d11dd8925888fc887d06a6e8491e16.js",
+                                     "size":  2484
+                                 },
+    "tests/project-suite.js":  {
+                                   "key":  "8603a3aa7071d6671ca7aaabd44e7ed1.js",
+                                   "size":  2417
+                               },
+    "RULE_X_FORCE_THE_WIRE.md":  {
+                                     "key":  "465f62c54d0e96932721f3195a5cf893.txt",
+                                     "size":  4078
+                                 },
+    "RULE_F_FACTORY_BUILD.md":  {
+                                    "key":  "19c789344fbd9055bb5eb722f7ab7c6e.txt",
+                                    "size":  5483
+                                },
+    "REVERSE_TREESHAKE_SEQ.md":  {
+                                     "key":  "0e5743169b5b3c8d17f7be4d7c1c9494.txt",
+                                     "size":  11181
+                                 },
+    "RULE_C_CAMPAIGN.md":  {
+                               "key":  "9e92f464db333436af4f62c4d62c6831.txt",
+                               "size":  5847
+                           },
+    "CHAT_LOG.md":  {
+                        "key":  "fd0029755bdcf0f950cb1a9062f310e7.txt",
+                        "size":  15125
+                    },
+    "change.log":  {
+                       "key":  "c7c418e608ab812e16ce3382aa652892.txt",
+                       "size":  7273
+                   },
+    "tests/docs-suite.js":  {
+                                "key":  "1aa51a9fe9ad6fdea9e9ff5b240f6219.js",
+                                "size":  1339
+                            },
+    "tests/run.js":  {
+                         "key":  "4fdcf8c4c74098ede551365c3f6a3f48.js",
+                         "size":  478
+                     },
+    "design-audit/rules.js":  {
+                                  "key":  "1886827f2fa3ce6c34934405f98d47c2.js",
+                                  "size":  37830
+                              },
+    "design-audit/audit.js":  {
+                                  "key":  "a576d03c99184b581daa504a031a5789.js",
+                                  "size":  5696
+                              },
+    "design-audit/index.js":  {
+                                  "key":  "6334d48437c50130c79f3779ae37c599.js",
+                                  "size":  151
+                              },
+    "design-audit/RULES.md":  {
+                                  "key":  "bc0b903583abbcb78fce13b4b3f2d29f.txt",
+                                  "size":  5040
+                              },
+    "tests/design-suite.js":  {
+                                  "key":  "29d30778d9d59cd5845ff2c13a4e80b2.js",
+                                  "size":  11257
+                              }
+}

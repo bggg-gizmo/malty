@@ -1,0 +1,272 @@
+[
+    {
+        "path":  "src/canvas-editor/BUILD.md",
+        "bytes":  8455,
+        "sha256":  "e6b00485ea8dcb21a20efa47c9a219b9e718b569127a115302eb1068bdc739e9",
+        "key":  "4f6c083eedc5a962a298e315a1827b5e.txt"
+    },
+    {
+        "path":  "src/canvas-editor/canvas-editor.js",
+        "bytes":  13561,
+        "sha256":  "b59ba873da61441b77e17b46544531458645802374eb90ac039752daf919aefe",
+        "key":  "6dc63ac49645428f4e469ea23cfad8bb.js"
+    },
+    {
+        "path":  "src/canvas-editor/diff.js",
+        "bytes":  3231,
+        "sha256":  "9c1f6af7fe03dd998e7eeeb17af7362f8dc35e7034dd9d11b8948f5a4cf09acd",
+        "key":  "426a3ccc4d00efcd30f715916fcf0565.js"
+    },
+    {
+        "path":  "src/canvas-editor/editor-worker.js",
+        "bytes":  35878,
+        "sha256":  "7722b3b882368fc2d670f0c3f1c5a6bfb329c2f203915334b9c480512485d359",
+        "key":  "fd14e4322b7446ce01d49046fa6e9b9d.js"
+    },
+    {
+        "path":  "src/canvas-editor/floating-window.js",
+        "bytes":  10422,
+        "sha256":  "9b3b7c4d5c96b35a1ee962cc996bf005818cb6de8aee2f4767e2eb4a9b440253",
+        "key":  "8a2f93dbf9ee80c2777acbc830985e99.js"
+    },
+    {
+        "path":  "src/canvas-editor/git.js",
+        "bytes":  7550,
+        "sha256":  "7b486c02b768d54f0b859f93eb9d09372ee1debdf2618cd146923c187a307e13",
+        "key":  "8b341f7597bdd4f235c54150804421a1.js"
+    },
+    {
+        "path":  "src/canvas-editor/index.js",
+        "bytes":  7779,
+        "sha256":  "e256c22097b157c1bc84c3a87dbfd3583064e2af20a5091c567f9c5adf87a834",
+        "key":  "b9db0b6d23ea94706e04b03cb6182b82.js"
+    },
+    {
+        "path":  "src/canvas-editor/project.js",
+        "bytes":  11466,
+        "sha256":  "73a74fb8ca827626bf96bf8227196074dfcd47d67deaef314e2316894818d60a",
+        "key":  "c97daa3d8441234c97fa771a08414d6e.js"
+    },
+    {
+        "path":  "src/canvas-editor/project-panel.js",
+        "bytes":  16485,
+        "sha256":  "0a55d41cf44d457b97c8cd020dc7e12298a19c44c9aa78a2a790f6e256b461d6",
+        "key":  "70f5dee74bbb2cef8c524c78b3b32f06.js"
+    },
+    {
+        "path":  "src/canvas-editor/store.js",
+        "bytes":  2648,
+        "sha256":  "93ed4bfcc2fdc7e11410aab464732c0ab9275c49e895df9d0d20a5efb721b234",
+        "key":  "3a0a099c89c355e0a6e9b1b4ba6eb6f7.js"
+    },
+    {
+        "path":  "src/canvas-editor/worker-source.js",
+        "bytes":  736,
+        "sha256":  "1687d9952a4e195dca5d14c7cbd2b9eb4f69299524c0032c5e888746a8cb5a72",
+        "key":  "6d2fb9fea6ad56e45a68228bcaabb438.js"
+    },
+    {
+        "path":  "src/change.log",
+        "bytes":  7273,
+        "sha256":  "71fd80d091c4e827d3b59ceedff0c1f5a16f7cd378b459e8d47b9a0183f03a24",
+        "key":  "c7c418e608ab812e16ce3382aa652892.txt"
+    },
+    {
+        "path":  "src/CHAT_LOG.md",
+        "bytes":  15125,
+        "sha256":  "16b5e7d43ff92a27a5831063cb0336977421abd9509c6d6a8a21378b185c67b1",
+        "key":  "fd0029755bdcf0f950cb1a9062f310e7.txt"
+    },
+    {
+        "path":  "src/CODE_REFERENCE.md",
+        "bytes":  4304,
+        "sha256":  "28b8a369844489c343e0754e0defcab4023b4620e8a3fcfdae6ef5dec9ea6c9f",
+        "key":  "f461c495481157d86b56815f51d47e57.txt"
+    },
+    {
+        "path":  "src/Conversation-History/Archive/00-raw-transcript-2026-09-24-01.txt",
+        "bytes":  12,
+        "sha256":  "17a465536c735c31603ab82d3fba8865d5138ddc05cae8cdf758c96d47b2ef89",
+        "key":  "60f730a1a8d8484f14416327e6155975.txt"
+    },
+    {
+        "path":  "src/Conversation-History/chat-record-00_2026-09-24.md",
+        "bytes":  1684,
+        "sha256":  "ab9920c1b93841ccc55f1385a8592ca51a0b60233c7e910b62cd924944602b53",
+        "key":  "bb40c18e26a5eaa9ed575d30ef61ced2.txt"
+    },
+    {
+        "path":  "src/Core-Design-Principles/core-design-principles-v01.00.md",
+        "bytes":  4158,
+        "sha256":  "7b3763f994ef60098eb7ad9a7f73b39464b32b319ed4ef386000b4c67270928c",
+        "key":  "0a28f85c665e1ce023b3f14b49bb1261.txt"
+    },
+    {
+        "path":  "src/Core-Design-Principles/core-design-principles-v01.01.md",
+        "bytes":  4424,
+        "sha256":  "7245efcab7dd864602c4e19d00f5c5bfcbf9be0593a0352020a77bb0f27f494a",
+        "key":  "34111b32e9b77d9a77d29c81f96fe781.txt"
+    },
+    {
+        "path":  "src/Core-Design-Principles/core-design-principles-v01.02.md",
+        "bytes":  4355,
+        "sha256":  "a8f8ab194dc4f4969496cc38af46d4549433596f9f1519d6a034fe87f742867a",
+        "key":  "ccdaf83d1d9ed3faf3c70f8ea4694536.txt"
+    },
+    {
+        "path":  "src/Core-Design-Principles/core-design-principles-v01.03.md",
+        "bytes":  4454,
+        "sha256":  "39e712cc0497b6b4100abbd415bab3e1d16be67494bc924a2b7a95e5c932a6eb",
+        "key":  "f74f7a6082cbf0e683fd5e8185d08705.txt"
+    },
+    {
+        "path":  "src/Core-Design-Principles/core-design-principles-v01.04.md",
+        "bytes":  4592,
+        "sha256":  "0bf80dc6ff2cd7a671c3e4f2f32700ed6bb4790c28f77feb1980bbc7e4d8070b",
+        "key":  "adde28be53451db1dc5fbec3bfd162af.txt"
+    },
+    {
+        "path":  "src/core-design-principles-latest.md",
+        "bytes":  4592,
+        "sha256":  "0bf80dc6ff2cd7a671c3e4f2f32700ed6bb4790c28f77feb1980bbc7e4d8070b",
+        "key":  "adde28be53451db1dc5fbec3bfd162af.txt"
+    },
+    {
+        "path":  "src/design-audit/audit.js",
+        "bytes":  5696,
+        "sha256":  "f8e0ef5c13fe81d96ed541b1319d6726796a77b15b985a92ee191fbd4256fe56",
+        "key":  "a576d03c99184b581daa504a031a5789.js"
+    },
+    {
+        "path":  "src/design-audit/index.js",
+        "bytes":  151,
+        "sha256":  "2e9ceee9b80d9fe92058b05c52e25786e5222fbc54bb4921fd2a11a7bac77378",
+        "key":  "6334d48437c50130c79f3779ae37c599.js"
+    },
+    {
+        "path":  "src/design-audit/rules.js",
+        "bytes":  37830,
+        "sha256":  "8b566a205c8ecc5239828f2840a323a5472c25731ae448d249c6d18e62035c3b",
+        "key":  "1886827f2fa3ce6c34934405f98d47c2.js"
+    },
+    {
+        "path":  "src/design-audit/RULES.md",
+        "bytes":  5040,
+        "sha256":  "3029908ce722d537fac6c0d510f3469621f192c1f35fdbbc5e59fd9d4cb3c4d9",
+        "key":  "bc0b903583abbcb78fce13b4b3f2d29f.txt"
+    },
+    {
+        "path":  "src/ISSUES_FIXES.md",
+        "bytes":  4168,
+        "sha256":  "f2388155d993db63abf7bb023b02c6fdce0bb8300ab3b703d530d10f1e737f9a",
+        "key":  "73b6e850ffa34c61134d8f03d9f7aa0e.txt"
+    },
+    {
+        "path":  "src/MEMORY_CUBE.md",
+        "bytes":  4954,
+        "sha256":  "b5eb93b154792ad86387950820fe24c31ceeb02212fd353e165bbee6bbcbfe75",
+        "key":  "4eb7d9d76ee685e22d1e3d3aa2dfc366.txt"
+    },
+    {
+        "path":  "src/plugins/index.json",
+        "bytes":  122483,
+        "sha256":  "4e3ff8885015d3894a39e221bfede41306f45805440252a7c55b5f13541bcf76",
+        "key":  "2d38b82798f5fb1c577fa9c4d00b3686.json"
+    },
+    {
+        "path":  "src/plugin-tools.js",
+        "bytes":  22673,
+        "sha256":  "f39310326af1619d31b714dfb63079a9ac5c39cc51577e2bdcd7d9c68a0a17b3",
+        "key":  "4f83cc144171b393edfe32f148234b67.js"
+    },
+    {
+        "path":  "src/README.md",
+        "bytes":  13441,
+        "sha256":  "43b212cb0451bfddf2553ba7a84c735cf767452304c3771b76f0e41d40fe7560",
+        "key":  "ea7985384be905f01bbbab979b3bc2ea.txt"
+    },
+    {
+        "path":  "src/REVERSE_TREESHAKE_SEQ.md",
+        "bytes":  11181,
+        "sha256":  "50f9ede9a58c7b341d9d65b4a9a0cf351aaf0f7bf49164a4a3829795df4e5954",
+        "key":  "0e5743169b5b3c8d17f7be4d7c1c9494.txt"
+    },
+    {
+        "path":  "src/RULE_C_CAMPAIGN.md",
+        "bytes":  5847,
+        "sha256":  "60eb720d83b1fc5997e05631f30382363531c6b7d8d490a7f53977ee27578ec5",
+        "key":  "9e92f464db333436af4f62c4d62c6831.txt"
+    },
+    {
+        "path":  "src/RULE_F_FACTORY_BUILD.md",
+        "bytes":  5483,
+        "sha256":  "c84d76475975554fb6c359acca8ffcb4aa4426a70f445cce259476d82300ab81",
+        "key":  "19c789344fbd9055bb5eb722f7ab7c6e.txt"
+    },
+    {
+        "path":  "src/RULE_X_FORCE_THE_WIRE.md",
+        "bytes":  4078,
+        "sha256":  "93a6dc14fcc6aa5f1c3d93c8098f4c088d54475d1d8df64bc3c6d0230cc2dddd",
+        "key":  "465f62c54d0e96932721f3195a5cf893.txt"
+    },
+    {
+        "path":  "src/SPEC.md",
+        "bytes":  1818,
+        "sha256":  "1fce3835ba029ec4bd400fda510f549686448d2b9895af6efcc0fa91ee46cb11",
+        "key":  "492d5951c65b2e02de8d5bba7b088d4e.txt"
+    },
+    {
+        "path":  "src/task-list.md",
+        "bytes":  2193,
+        "sha256":  "9e21e01c92491bb7000a2af8fa6861420dca80f272f85fc6bb29ad330f555837",
+        "key":  "1ce89867b1ae7c3beb65181cfc8f56b7.txt"
+    },
+    {
+        "path":  "src/tests/design-suite.js",
+        "bytes":  11257,
+        "sha256":  "d2b757b9ae67311feee3c153a921b4a872e0c3d47149fe0f4e0f96e6637a6117",
+        "key":  "29d30778d9d59cd5845ff2c13a4e80b2.js"
+    },
+    {
+        "path":  "src/tests/docs-suite.js",
+        "bytes":  1339,
+        "sha256":  "1dbbefa3b26c47cc705a815181e25b9a4d9a8942ebb61c7a245fb5d3daf89227",
+        "key":  "1aa51a9fe9ad6fdea9e9ff5b240f6219.js"
+    },
+    {
+        "path":  "src/tests/project-suite.js",
+        "bytes":  2417,
+        "sha256":  "6dddc5da4246c035b9c0cc0369a70545d4b193d560dde528120a4ec8d6f16de1",
+        "key":  "8603a3aa7071d6671ca7aaabd44e7ed1.js"
+    },
+    {
+        "path":  "src/tests/run.js",
+        "bytes":  478,
+        "sha256":  "dd7dc6abf719a68d3542049a4cd83f6243a89c04bc6e32be066b3f0b8e10a092",
+        "key":  "4fdcf8c4c74098ede551365c3f6a3f48.js"
+    },
+    {
+        "path":  "src/tests/workspace-suite.js",
+        "bytes":  2484,
+        "sha256":  "021c767bf1ba2453db18fcac3de821a7ba3d652b42712d6b6550677dc7070467",
+        "key":  "d8d11dd8925888fc887d06a6e8491e16.js"
+    },
+    {
+        "path":  "src/TODO.md",
+        "bytes":  638,
+        "sha256":  "2ec74cb1349b36370b000783d65da24f45969c70a11b37158377be0443873b6e",
+        "key":  "7f13e7050f2232c1ae0ebd688e727a8d.txt"
+    },
+    {
+        "path":  "src/treeshake-worklist.md",
+        "bytes":  1102,
+        "sha256":  "af2d306f50a5936c9dda54fdb856052f2951ec7c18f5e09854c083a7026c0da6",
+        "key":  "64413d81c64fac0937e27256b3fa675e.txt"
+    },
+    {
+        "path":  "src/version-history.md",
+        "bytes":  5375,
+        "sha256":  "cc355171fd41bee2c3d5116bb46aba2849ac6704ba9d90d1d4609f249c7437c8",
+        "key":  "834a8f0e3a3c5b95a97dd0125a8d929d.txt"
+    }
+]
