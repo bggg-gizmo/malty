@@ -19,3 +19,9 @@ Unfinished:
 - Physical-device acceptance, authenticated external service verification, and full upstream plugin parity remain open.
 
 Development boundary: preserve all existing features and UI/UX. Do not mirror private assets, release signing credentials, or unlicensed recovered third-party components to the public repository without explicit authorization.
+
+## 2026-10-29 — direct public-testing APK publication
+
+The byte-verified signed v0.9.2 APK was published as `downloads/v0.9.2/Malty-signed-v0.9.2.apk` in `main`, with `downloads/v0.9.2/SHA256SUMS.txt` and `downloads/v0.9.2/RELEASE_NOTES.md`. Its Git blob SHA is `25ad469fe17db0a7cac26597d2afb8b22ae52403` and SHA-256 is `a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e`. Existing README content was retained while adding a direct public download path.
+
+This is an Android *testing build*. No device or live external-service certification is claimed. The GitHub connector does not expose release creation, so no GitHub Release object or tag is claimed. Private development ZIPs, prior source archives, unsigned APK, SQLite state, signing keys and coordination logs were not copied here. GitHub Actions were not used.

@@ -28,3 +28,11 @@ Private development repository: https://github.com/bggg-gizmo/malty-dev
 ## Non-regression
 
 The public repository's documentation and issue forms do not change Android application code, UI layouts, embedded services, app identity, APK signing keys, or the existing development commit history. No GitHub Actions are required.
+
+## 2026-10-29 — additional verified progress
+
+- [x] The signed v0.9.2 candidate APK is publicly downloadable at `downloads/v0.9.2/Malty-signed-v0.9.2.apk` with a matching SHA-256 checksum.
+- [x] Public release notes explicitly disclose outstanding physical-device, authenticated-service, and plugin-parity acceptance.
+- [x] Source and recovered-private-development archives have not been mirrored into the public repository.
+- [ ] Create the native GitHub Releases **prerelease entry** (not supported by the connected GitHub Git Data actions); then verify GitHub-downloaded release assets.
+- [ ] Activate and verify public repository rulesets and finish device/live-service acceptance.

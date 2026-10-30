@@ -1,6 +1,8 @@
 # Malty v0.9.2 — public-testing candidate
 
-Status: **candidate prepared; public APK release not yet published**.
+Status: **signed testing APK published directly in the public repository; GitHub Releases prerelease entry not yet created**.
+
+Public download: [Malty-signed-v0.9.2.apk](../downloads/v0.9.2/Malty-signed-v0.9.2.apk). Checksums: [SHA256SUMS.txt](../downloads/v0.9.2/SHA256SUMS.txt).
 
 This file documents the exact signed and unsigned Android packages supplied for the v0.9.2 checkpoint. It is not a claim of completed on-device certification or a download link.
 

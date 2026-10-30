@@ -46,7 +46,11 @@ These capabilities exist in the project source. Their presence does **not** mean
 
 ## Get Malty
 
-See the **[Releases page](https://github.com/bggg-gizmo/malty/releases)** for public APKs and accompanying release notes when they are published. Download only release artifacts whose publisher and checksums you have verified.
+**[Download Malty v0.9.2 signed Android testing APK](downloads/v0.9.2/Malty-signed-v0.9.2.apk)** · [SHA-256 checksums](downloads/v0.9.2/SHA256SUMS.txt) · [Testing release notes](downloads/v0.9.2/RELEASE_NOTES.md)
+
+This is a **public testing build**, not a production-certified release. Physical-device acceptance, live authenticated-service operations, and complete recovered-plugin parity remain unverified. GitHub's Releases prerelease entry is not yet created; this downloadable APK is hosted directly in the repository.
+
+See the **[Releases page](https://github.com/bggg-gizmo/malty/releases)** for separately published GitHub Releases when they become available. Download only release artifacts whose publisher and checksums you have verified.
 
 - Android 8.0 / API 26 or later is the build's minimum supported Android version.
 - Public device testing, authenticated Moltbook transactions, remote collaboration, and full upstream plugin parity have **not** yet been certified for the v0.9.2 development checkpoint.
