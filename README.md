@@ -96,6 +96,8 @@ The v0.9.2 source package includes recorded host-side checks:
 | Live authenticated Moltbook / Bridge flows | **Not yet verified** |
 | Full original plugin behavior parity | **Not certified** |
 
+For repeatable on-device validation, see the [Malty v0.9.2 Android acceptance runner](docs/DEVICE_ACCEPTANCE_v0.9.2.md). Its 24 offline regression tests passed; physical-device execution still requires a connected Android device.
+
 The test numbers above are historical results from the development workspace, **not** live CI badges. The GitHub badges at the top show actual GitHub repository information, not an invented passing build status.
 
 ## Privacy and connectivity
