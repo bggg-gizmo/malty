@@ -1,0 +1,23 @@
+{
+  "version": "0.9.2",
+  "artifact": "downloads/v0.9.2/Malty-signed-v0.9.2.apk",
+  "size_bytes": 555143,
+  "sha256": "a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e",
+  "git_blob_sha1": "25ad469fe17db0a7cac26597d2afb8b22ae52403",
+  "apk_signing": {
+    "v2_verified": true,
+    "v3_verified": true,
+    "certificate_sha256": "c2dedd7d4dbaa1b3eaf499849f2da4cc411e4e2779ce8c16642dfb5b57452010"
+  },
+  "apk_zip_entry_count": 24,
+  "release_verifier_host_tests": {
+    "passed": 6,
+    "failed": 0
+  },
+  "device_runtime_verified": false,
+  "authenticated_live_services_verified": false,
+  "external_plugin_parity_verified": false,
+  "native_github_release_created": false,
+  "public_rulesets_activated": false,
+  "source_code_and_ui_changed": false
+}

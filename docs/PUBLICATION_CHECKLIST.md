@@ -36,3 +36,13 @@ The public repository's documentation and issue forms do not change Android appl
 - [x] Source and recovered-private-development archives have not been mirrored into the public repository.
 - [ ] Create the native GitHub Releases **prerelease entry** (not supported by the connected GitHub Git Data actions); then verify GitHub-downloaded release assets.
 - [ ] Activate and verify public repository rulesets and finish device/live-service acceptance.
+
+## Checkpoint 4 verification progress
+
+- [x] Verified the published testing APK against pinned SHA-256, Git blob SHA-1, and exact byte count.
+- [x] Verified v2/v3 APK signatures and certificate continuity with APKSigner.
+- [x] Added a fully offline artifact verifier and Windows CMD wrapper, with six passing negative/positive regression tests.
+- [x] Confirmed the recovery archive's bytes are preserved as eight verified segments in the private development repository with a reconstruction tool.
+- [ ] Create a native GitHub Releases prerelease and independently verify its release asset download when release creation is available.
+- [ ] Resolve existing PR-required main ruleset versus directly publishing to main without pull requests before activating protection.
+- [ ] Complete physical-device, authenticated service, and full plugin-parity acceptance.

@@ -25,3 +25,13 @@ Development boundary: preserve all existing features and UI/UX. Do not mirror pr
 The byte-verified signed v0.9.2 APK was published as `downloads/v0.9.2/Malty-signed-v0.9.2.apk` in `main`, with `downloads/v0.9.2/SHA256SUMS.txt` and `downloads/v0.9.2/RELEASE_NOTES.md`. Its Git blob SHA is `25ad469fe17db0a7cac26597d2afb8b22ae52403` and SHA-256 is `a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e`. Existing README content was retained while adding a direct public download path.
 
 This is an Android *testing build*. No device or live external-service certification is claimed. The GitHub connector does not expose release creation, so no GitHub Release object or tag is claimed. Private development ZIPs, prior source archives, unsigned APK, SQLite state, signing keys and coordination logs were not copied here. GitHub Actions were not used.
+
+## 2026-10-29 — checkpoint 4 artifact verification
+
+- Verified the public v0.9.2 APK against SHA-256 `a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e`, byte size 555143, and Git blob SHA `25ad469fe17db0a7cac26597d2afb8b22ae52403`.
+- Ran six dedicated release-verifier regression tests (6/6), including malformed ZIP, embedded database, manipulated checksum, duplicate ZIP entries, ZIP path traversal, and valid signed candidate.
+- Verified APKSigner v2/v3 signatures and signer certificate SHA-256 `c2dedd7d4dbaa1b3eaf499849f2da4cc411e4e2779ce8c16642dfb5b57452010`.
+- Added standard-library offline verifier `scripts/verify_v092_artifacts.py`, Windows wrapper `scripts/VERIFY-MALTY-v0.9.2.cmd`, and machine-readable `docs/VERIFICATION_v0.9.2.json`.
+- Existing `main` policy JSON includes a PR requirement that conflicts with the current direct-to-`main`, no-PR publishing workflow. Both public rulesets remain inactive; no protection settings were changed.
+- A native GitHub Releases prerelease still requires a release-creation capability unavailable through the connected GitHub Git Data integration. The public signed APK remains directly downloadable in `downloads/v0.9.2/`.
+- Physical device execution, authenticated live services, and complete recovered-plugin parity have not been certified. No GitHub Actions, force pushes, or unauthorized branches were used.
