@@ -1,0 +1,54 @@
+{
+    "generator-url.txt":  {
+                              "key":  "af1f53896fa8d8b085cf1d0834d93b87.txt",
+                              "size":  101
+                          },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.00.txt":  {
+                                                                       "key":  "7e5be7d8e5bd09630615bc8802a05aad.txt",
+                                                                       "size":  37336
+                                                                   },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.01.txt":  {
+                                                                       "key":  "6fe3547aa774d4e69836808c26b7c06c.txt",
+                                                                       "size":  39441
+                                                                   },
+    "skills/fetch-latest-blueprint.md":  {
+                                             "key":  "86b7485ad2fcb6411bfda2ba612576ad.txt",
+                                             "size":  8300
+                                         },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.02.txt":  {
+                                                                       "key":  "998415a2741b38bb6e7a0a63618e916f.txt",
+                                                                       "size":  42622
+                                                                   },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.03.txt":  {
+                                                                       "key":  "f10a15b0c67284561f85a993fcee72d2.txt",
+                                                                       "size":  46694
+                                                                   },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.04.txt":  {
+                                                                       "key":  "8085d6ed7029be66890b6178cc61858c.txt",
+                                                                       "size":  48328
+                                                                   },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.05.txt":  {
+                                                                       "key":  "f8ff8e4d1a5fe88df4e8ce901374ffd0.txt",
+                                                                       "size":  48465
+                                                                   },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.06.txt":  {
+                                                                       "key":  "0a78036f56b88dfc1b9f23dba0ebfc43.txt",
+                                                                       "size":  61639
+                                                                   },
+    "Blueprint-Archive/perchance-ai-helper-blueprint-v02.07.txt":  {
+                                                                       "key":  "6ee15906a26eff1f04527b3adefac027.txt",
+                                                                       "size":  64481
+                                                                   },
+    "adopt-main-snippet.pjs":  {
+                                   "key":  "f4b17bd5b4d98be12efa9e79433de6b4.txt",
+                                   "size":  4207
+                               },
+    "perchance-ai-helper-blueprint-latest.txt":  {
+                                                     "key":  "70af2b9550dc4fd74ba430270e626ef0.txt",
+                                                     "size":  159890
+                                                 },
+    "README.md":  {
+                      "key":  "b4c5ceedf9e06e60d7b1877113bff1d4.txt",
+                      "size":  23066
+                  }
+}

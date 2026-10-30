@@ -1,0 +1,80 @@
+[
+    {
+        "path":  "src/adopt-main-snippet.pjs",
+        "bytes":  4207,
+        "sha256":  "556f14bbaf951d440532c7c7b853dbb2d988bda78f12f7e4baba9348cb91bb48",
+        "key":  "f4b17bd5b4d98be12efa9e79433de6b4.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.00.txt",
+        "bytes":  37336,
+        "sha256":  "197b8170f08411f81a0e24de3e2d4bd127198efaf0afbe999f9af1f384372691",
+        "key":  "7e5be7d8e5bd09630615bc8802a05aad.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.01.txt",
+        "bytes":  39441,
+        "sha256":  "7964872507012b1b2caf038a2d6568a499aca90d30d6aa372dbb8f32f999dadf",
+        "key":  "6fe3547aa774d4e69836808c26b7c06c.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.02.txt",
+        "bytes":  42622,
+        "sha256":  "e18c3a0741c11432b402be5a13caa1eb58e7b398d58ec74d86d69643d72d504f",
+        "key":  "998415a2741b38bb6e7a0a63618e916f.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.03.txt",
+        "bytes":  46694,
+        "sha256":  "dbd9037cf13f3fd200bc19fbd1e88db5783cb834caf10f010ca5f2c5bbb6d6af",
+        "key":  "f10a15b0c67284561f85a993fcee72d2.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.04.txt",
+        "bytes":  48328,
+        "sha256":  "47c5fff8cda350f5ea3063e0d796a84219a5c038c5e3f9f97d111a7dc541c7a9",
+        "key":  "8085d6ed7029be66890b6178cc61858c.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.05.txt",
+        "bytes":  48465,
+        "sha256":  "2bcb0296aed0a141e6658d3fbab30cb5526afea47dfccdc2f2df179f32c9e855",
+        "key":  "f8ff8e4d1a5fe88df4e8ce901374ffd0.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.06.txt",
+        "bytes":  61639,
+        "sha256":  "b60209674dda10e83f6192fbe71f89dada4fa69570d16e4968020a75b7c0660d",
+        "key":  "0a78036f56b88dfc1b9f23dba0ebfc43.txt"
+    },
+    {
+        "path":  "src/Blueprint-Archive/perchance-ai-helper-blueprint-v02.07.txt",
+        "bytes":  64481,
+        "sha256":  "4844519a760000e504d78fdb4d99ff1a42b01aaf47b42a91fbe79d525628c7fd",
+        "key":  "6ee15906a26eff1f04527b3adefac027.txt"
+    },
+    {
+        "path":  "src/generator-url.txt",
+        "bytes":  101,
+        "sha256":  "40ab0e541b5ed12e78ef4b3e2cb78f93da3578dfb00400924a6a93d5ada24be6",
+        "key":  "af1f53896fa8d8b085cf1d0834d93b87.txt"
+    },
+    {
+        "path":  "src/perchance-ai-helper-blueprint-latest.txt",
+        "bytes":  159890,
+        "sha256":  "80d57b89620bd891f52b7af0c58f20f897d651d036a5aba33d9c72303bf83f83",
+        "key":  "70af2b9550dc4fd74ba430270e626ef0.txt"
+    },
+    {
+        "path":  "src/README.md",
+        "bytes":  23066,
+        "sha256":  "6734d039f83350dbc8f4cab64a43bfb9f7473fc54b6f91bd4089c776beac2044",
+        "key":  "b4c5ceedf9e06e60d7b1877113bff1d4.txt"
+    },
+    {
+        "path":  "src/skills/fetch-latest-blueprint.md",
+        "bytes":  8300,
+        "sha256":  "a97bc35ef0497e1a0816903ef620b4f634d6a7cbe53aad34417549b78a9bfbcd",
+        "key":  "86b7485ad2fcb6411bfda2ba612576ad.txt"
+    }
+]

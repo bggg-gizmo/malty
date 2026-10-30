@@ -1,0 +1,819 @@
+// ============================================================================
+// >>> PERCHANCE AI HELPER — BLUEPRINT <<<
+// ----------------------------------------------------------------------------
+// This file contains two operating modes: Core and Full. At the start of a
+// session, read the Startup section below, then ask the user which mode they'd
+// like. Follow ONLY the relevant section — don't act on instructions from the
+// other mode unless the user explicitly switches or the Core mode triggers
+// suggest upgrading.
+//
+// The file is larger than a single-mode blueprint, but that's intentional:
+// you don't need to read or act on the Full Mode section unless the user
+// chooses Full mode or the Core mode triggers fire and the user agrees to
+// upgrade. Core mode is self-contained.
+// ============================================================================
+
+# Perchance AI Helper — Blueprint
+
+Created: July 30, 2026. Updated: July 30, 2026. v2.0
+
+## How to Use
+
+Place this file in `src/`. Tell the AI: "Read `src/perchance-ai-helper-blueprint-v02.00.txt`."
+The AI reads the Startup section, asks which mode you want, and follows only
+that section. No further setup needed for Core mode; Full mode runs its own
+First Session Setup process.
+
+For a fresh session, add a one-line pointer in main.pjs:
+
+```pjs
+// Read src/perchance-ai-helper-blueprint-v02.00.txt before starting.
+```
+
+---
+
+## Startup
+
+When you read this file, ask the user which mode they'd like:
+
+> "Which mode would you like?
+>
+> 1. **Core mode** — quick sessions, short projects, throwaway experiments.
+>    Just the behavioral protocol — no file structures, no history tracking.
+>    Lightweight and fast.
+>
+> 2. **Full mode** — long-term projects that accumulate context worth keeping
+>    across sessions: conversation history, design decisions, architecture
+>    maps, task tracking. Sets up a full file structure on first use.
+>
+> Not sure? Start with Core — I'll suggest switching to Full if the project
+> grows."
+
+If the user describes a full project idea or something they'll return to
+across sessions, default to Full mode. If they describe a quick one-off task,
+default to Core. When unsure, start Core — the triggers in the Core section
+will catch it if the project trends toward needing Full mode.
+
+**Follow only the chosen section.** Don't read through or act on the other
+section's instructions unless:
+- The user explicitly switches modes, or
+- The Core mode triggers fire and the user agrees to upgrade to Full mode.
+
+---
+
+## CORE MODE
+
+The essential personality and user experience protocol. For short sessions,
+quick projects, or throwaway experiments. No memory between sessions — each
+fresh session starts from scratch.
+
+### Core Behavior
+
+1. **Timestamps**: Begin every message with a fresh Eastern Time timestamp
+   in the format "Jul 30, 2026 -- 5:36 pm ET". Use the Date object with
+   America/New_York timezone. Never reuse or copy a timestamp from a
+   previous message — fetch a fresh one each time.
+
+2. **Discuss before implementing**: Prefer to discuss and confirm changes
+   before editing files. Wait for the user's go-ahead before coding. Don't
+   start writing code until they say to.
+
+3. **Keep the user informed**: Share progress, discoveries, and conclusions
+   as you go. Don't disappear for long stretches with no communication. Don't
+   barrage them either — find a balance.
+
+4. **Acknowledge notes**: When the user gives feedback or notes, acknowledge
+   and collect them. Don't immediately act on everything — sometimes feedback
+   is for later, not an instruction to execute now.
+
+5. **Safety check**: If about to do anything major, extreme, foolish,
+   catastrophic, or irreversible — stop and confirm with the user first.
+
+6. **Adapt**: If the user says "just do it" or wants speed over discussion,
+   switch modes. The protocol serves the user, not the other way around.
+
+### main.pjs (Minimal)
+
+For a core session, main.pjs just needs the basics:
+
+```pjs
+// Read src/perchance-ai-helper-blueprint-v02.00.txt before starting.
+
+$meta
+  title = [PROJECT TITLE]
+  description = [PROJECT DESCRIPTION]
+
+// Add plugin imports as needed.
+```
+
+### Available Plugin Imports
+
+| Import | What it does |
+|--------|-------------|
+| `superFetch = {import:super-fetch-plugin}` | Fetch any URL without CORS issues |
+| `generateText = {import:ai-text-plugin}` | AI text generation (streaming, vision) |
+| `generateImage = {import:text-to-image-plugin}` | AI image generation at runtime |
+| `kv = {import:kv-plugin}` | Persistent storage (IndexedDB, survives reloads) |
+| `createServerSocket = {import:server-plugin}` | Realtime multiplayer server |
+| `uploadPlugin = {import:upload-plugin}` | Upload files to a permanent URL |
+| `commentsPlugin = {import:comments-plugin}` | Comments/chat/guestbook widgets |
+| `secretPlugin = {import:secret-plugin}` | Synchronous public-key encryption |
+
+Add only what the project uses. Each has a skill with full reference docs —
+load the skill before using non-trivial features.
+
+### When to Suggest Switching to Full Mode
+
+Core mode carries no memory between sessions. Each time a fresh session
+opens, the AI starts from scratch. That's the right mode when the project is
+small enough that "the code plus a quick explanation from you" is all the
+context the AI needs.
+
+Full mode exists for projects that accumulate context worth keeping —
+conversation history, design decisions, settled debates, architecture maps,
+task backlogs. It carries all of that forward automatically so a fresh session
+picks up where the last one left off instead of re-deriving everything. The
+Full Mode section is in this same file — if the user agrees to upgrade,
+switch to it and run its First Session Setup process.
+
+#### Early Triggers — Suggest Before It's Too Late
+
+Don't wait until context is already being lost or history is being
+re-explained. Watch for the early signs that a project is trending toward
+needing Full mode, and suggest switching at the first indication — before
+time is wasted. Raise it as a brief, non-pushy suggestion, then let the user
+decide.
+
+Suggest switching when you notice any of these:
+
+- **This is the second session on the same project** — the user is back to
+  continue work from before. Even if it's just the second time, that's the
+  first signal that context will need to carry forward.
+- **The user references a previous session** — "like we did before",
+  "remember when we tried", "last time you" — they're carrying context in
+  their head that the AI doesn't have. That's the moment to flag it, before
+  it becomes a pattern.
+- **Design decisions are accumulating** — color palettes, architecture
+  choices, data structures, interaction patterns. If there are more than two
+  or three settled decisions that a future session would need to respect,
+  they should be written down before they're forgotten.
+- **Features are starting to interact** — the code isn't just isolated
+  pieces anymore; changes in one area affect another. That complexity is
+  hard to reconstruct from scratch and benefits from an architecture map.
+- **The user is re-explaining something** — if they have to tell you
+  something that a previous session already knew, that's one re-explanation
+  too many. Flag it before the third time.
+
+#### How to Suggest
+
+Keep it brief and let the user decide:
+
+> "This project is starting to accumulate context that won't survive a fresh
+> session. If you plan to keep working on this across more sessions, Full mode
+> would carry design decisions and history forward automatically — it's in
+> this same file, so I can switch to it right now and run the setup. Want me
+> to do that, or is Core fine for now?"
+
+Never push. The user may have good reasons to stay lean — maybe the project
+is almost done, or they prefer the lighter workflow. Suggest once, then drop
+it unless the signs keep compounding.
+
+#### How to Upgrade
+
+1. Tell the user you're switching to Full mode.
+2. Read the Full Mode section below.
+3. Run its First Session Setup process — it will create the folder structure,
+   design doc, conversation history, and task list.
+4. Pull any existing context from the Core session into the new structure
+   (design notes, decisions, what's been built so far).
+
+---
+
+## FULL MODE
+
+// ============================================================================
+// >>> FULL MODE — ACTIVATE ONLY WHEN THE USER CHOOSES FULL MODE OR AGREES
+// >>> TO UPGRADE FROM CORE. IF YOU ARE IN CORE MODE, DO NOT READ FURTHER
+// >>> OR ACT ON ANYTHING BELOW UNLESS UPGRADING.
+// ============================================================================
+
+A complete working system for collaborating with the AI helper on a long-term
+project. Read this entire section, then immediately begin the First Session
+Setup process. Do not wait for further instructions. Do not ask "what should
+I do?" — the instructions are all here.
+
+# Perchance AI Helper — Project System Blueprint
+
+Created: July 30, 2026. Updated: July 30, 2026. v2.0
+
+## Version Control Policy
+
+This document is under version control. Every edit creates a new version —
+previous versions are never overwritten.
+
+### File naming
+Files are named `perchance-ai-helper-blueprint-vXX.YY.ZZ.md`, where `XX.YY.ZZ`
+is the version number with **zero-padded** components (two digits each) in
+the **filename** for correct lexicographic sorting (e.g.
+`perchance-ai-helper-blueprint-v01.00.md`). The patch number `ZZ` may be
+omitted when zero (e.g. `v01.00` is equivalent to `v01.00.00`). Zero-padding
+is used **only in filenames** — version references in document text use plain
+numbers (e.g. v1.0, not v01.00).
+
+### File location and archiving
+- The **latest version** lives at the **top level of `src/`**. The filename
+  includes the current version number.
+- **Previous versions** are archived in a `Blueprint-Archive/` folder at the
+  same level, with their version number in the filename.
+- The AI helper cannot delete or move files. To work around this, the
+  versioning workflow uses **archive-then-overwrite**: (1) copy the current
+  file into the archive folder (preserving it with its version number), then
+  (2) overwrite the file in place with the new version's header and content
+  changes. Since the old version is safely archived first, overwriting is
+  safe. No stale files are left behind.
+
+### When making changes
+1. **Check existing versions first**: Run `glob` for
+   `Blueprint-Archive/perchance-ai-helper-blueprint-v*.md` to see what
+   versions are archived. Also read the header of the current file to see
+   the current version number. The next version number must be one higher
+   (at the appropriate level — patch, minor, or major). NEVER assume the
+   next number — always verify.
+2. **Archive the current version**: Copy the current file into
+   `Blueprint-Archive/` with its version number in the filename. This
+   preserves the old version before any changes.
+3. **Overwrite the file in place**: Update the file's header with the new
+   version number and "Updated" date, then make all content changes directly
+   in this file. The filename stays the same (with the new version number).
+   Since the old version is already safely archived, overwriting is safe.
+4. **Never create new numbered files alongside the current one**: There
+   should only be ONE blueprint file at a time. Numbered versions live only
+   in the archive folder.
+5. **Never edit an archived file**: Archived versions are frozen. All edits
+   go into the current file only.
+
+### Version numbering
+- **Patch** (increment the third number): Trivial fixes only — typos,
+  formatting, removing duplicates, small clarifications that don't change
+  meaning. e.g. v1.0 → v1.0.1 (filename: v01.00.01).
+- **Minor change** (increment the decimal): New sections, new content,
+  additions to existing sections, clarifications that change meaning, small
+  tweaks. Any change that adds information or alters the document's content
+  beyond a trivial typo. e.g. v1.0 → v1.1 (filename: v01.01), v1.99 → v2.0
+  (filename: v02.00).
+- **Major change** (increment the ones place): Substantial structural
+  changes, significant decisions, large-scale reorganization. e.g. v1.12 →
+  v2.0 (filename: v02.00).
+- Update the "Updated" date to the actual date of the change.
+
+## What This Is
+
+This document captures a complete working system for collaborating with the
+Perchance AI helper on a long-term project. It includes:
+
+- **Behavioral protocol** — how the AI should interact with the user
+- **File structures** — folders and files that organize project knowledge
+- **Instruction templates** — comment blocks for main.pjs that persist across sessions
+- **Version control policies** — how to manage design documentation and code versions
+- **Conversation history system** — chronological records that survive across sessions
+- **Task management** — active tracking of work in progress, priorities, and completion
+
+It is project-agnostic. Fill in the project-specific content and the system is
+ready to go.
+
+## First Session Setup
+
+When the AI receives this section, it should follow this sequence:
+
+### Step 1 — Introduce and Inquire
+
+Begin by greeting the user and asking about the project. Don't create any
+files yet. Ask:
+
+1. **What is the project?** — What are you building? What does it do?
+2. **What is the project's title and short description?** — For the `$meta`
+   block in main.pjs (title is the generator name; description is used for SEO
+   and the generator listing page).
+3. **What plugin imports are needed?** — e.g. superFetch, generateText,
+   generateImage, kv, server-plugin, comments-plugin, etc. (See the plugin
+   list in Part 7.)
+4. **Any known design decisions or constraints already?** — Things the AI
+   should know upfront that should go into the initial design doc. This can
+   be minimal — the design doc gets filled in collaboratively as the project
+   develops.
+
+Ask these in a conversational way, not as a rigid form. The user may answer
+all at once or one at a time. Wait until you have at least the title,
+description, and plugin imports before proceeding to Step 2.
+
+### Step 2 — Build the System
+
+Once you have the project details:
+
+1. Create the folder structure described in Part 1
+2. Write `main.pjs` using the template in Part 2 (fill in `$meta` with the
+   project's title and description; add the requested plugin imports)
+3. Create the core design principles document using the template in Part 3
+   (set version to v01.00, fill in the project overview and any design
+   decisions the user shared)
+4. Create `src/task-list.md` using the template in Part 4
+5. Create `src/version-history.md` using the template in Part 5
+6. Create the first chat record: `src/Conversation-History/chat-record-00_<date>.md`
+   noting the setup session
+
+### Step 3 — Confirm and Begin
+
+Confirm to the user that the system is set up. Summarize what was created.
+Then ask what they'd like to work on first.
+
+---
+
+## Part 1: Folder Structure
+
+```
+src/
+├── core-design-principles-vXX.YY.ZZ.md   ← latest design doc (top level, one file)
+├── Core-Design-Principles/                ← archived previous versions
+│   ├── core-design-principles-v01.00.md
+│   └── ...
+├── Conversation-History/
+│   ├── chat-record-00_YYYY-MM-DD.md       ← polished narrative per session
+│   ├── chat-record-01_YYYY-MM-DD.md
+│   └── Archive/
+│       ├── 00-raw-transcript-YYYY-MM-DD.txt  ← verbatim records (user-provided)
+│       └── ...
+├── task-list.md                           ← active task tracker (living file)
+└── version-history.md                     ← code version history (living file)
+```
+
+**Key principles:**
+- `src/` files persist across sessions and ship with the generator
+- Only ONE design doc at the top level of `src/` — previous versions archived
+- Chat records are the AI's polished narrative; raw transcripts are user-provided
+- `task-list.md` and `version-history.md` are living files — edit in place
+- Zero-padded version numbers in filenames for correct lexicographic sorting
+
+---
+
+## Part 2: main.pjs Template
+
+Write this content to `main.pjs`. Replace `[PROJECT TITLE]`, `[PROJECT
+DESCRIPTION]`, and `[projectname]` with the actual project details. Add plugin
+imports as needed.
+
+```pjs
+// ============================================================================
+// >>> READ FIRST — DO THIS BEFORE ANY TASK, EVERY SESSION, NO EXCEPTIONS <<<\n// ----------------------------------------------------------------------------
+// This file (main.pjs) contains critical project instructions in its comment
+// blocks. READ ALL OF THEM before doing anything. They cover timestamps,
+// design constraints, conversation history, task list, session wrap-up, and
+// backup procedures.
+//
+// Then read these files in this order:
+//   1. src/core-design-principles-v*.md  — the single latest version at the
+//      TOP LEVEL of src/ (e.g. src/core-design-principles-v01.00.md). Previous
+//      versions are in src/Core-Design-Principles/ (archives, don't read those).
+//      This is the inviolable design doc — never violate it without user
+//      approval.
+//   2. src/Conversation-History/  — all chat-record-NN_*.md files. This is the
+//      chronological story of everything we've done. Read them to understand
+//      what's already been solved and why decisions were made.
+//   3. src/task-list.md  — the active task tracker. Know what's in progress,
+//      what's urgent, and what's done.
+//
+// DO NOT start working until you've read all of the above. If a task seems
+// simple (like "make a backup"), still read first — the instructions here
+// define HOW backups work, and getting it wrong wastes the user's time.
+//
+// >>> USER REMINDER <<<
+// If you (the user) are reading this because a fresh session just opened and
+// the AI hasn't read anything yet, paste this to kick it off:
+//
+//   "Read main.pjs and follow the READ FIRST banner at the top. Read the
+//    latest core-design-principles doc in src/, the conversation history in
+//    src/Conversation-History/, and src/task-list.md before we start."
+//
+// ============================================================================
+//
+// TIMESTAMPS: Begin every message to the user with a timestamp in Eastern
+// Time, formatted as "Jul 27, 2026 -- 3:20 pm ET". Do not guess or estimate —
+// use the Date object to get the exact time in America/New_York. Fetch a
+// FRESH timestamp for every single message — never reuse or copy a timestamp
+// from a previous message. Do this for every message in every session, no
+// exceptions.
+//
+// IMPORTANT: Before making any changes to this project, read the latest
+// version of the core design principles doc. The LATEST version is the single
+// core-design-principles-v*.md file at the top level of src/ (e.g.
+// src/core-design-principles-v01.00.md). Previous versions are archived in
+// src/Core-Design-Principles/. Treat the doc's contents as inviolable design
+// constraints — do not change any design described there without direct user
+// approval. The document is version-controlled; see the Version Control
+// Policy section within it for how to make changes (archive-then-overwrite
+// workflow). Version numbers are zero-padded (vXX.YY.ZZ) for correct file
+// sorting.
+//
+// CONVERSATION HISTORY: Read the files in src/Conversation-History/ at the
+// start of every session. This is a perpetual chronological record of our
+// collaboration — a faithful narrative of the conversation flow: what was
+// reported, how it was investigated, dead ends, tests run and what they
+// showed, the fix and how it was verified, and what came next — in order, as
+// it happened. It exists so we never waste time re-solving problems we
+// already fixed. The text can be shorter than the original conversation, but
+// it must read like a story of the work, NOT a condensed summary of outcomes.
+// Include dates and timestamps throughout the history record wherever
+// available — date session headers, mark handoff boundaries with dates, and
+// timestamp significant events or version changes within entries. When
+// writing new entries, include the current date and time for each entry so
+// the timeline is preserved for future sessions. History is split into
+// individual files per session, named chat-record-NN_YYYY-MM-DD.md (zero-
+// padded session number), stored in src/Conversation-History/. Read all
+// existing chat record files to understand the full history. Use handoff
+// points as session boundaries (mark them with a "--- Session Boundary ---"
+// header). Raw transcripts (verbatim records) live in
+// src/Conversation-History/Archive/ as NN-raw-transcript-YYYY-MM-DD.txt (also
+// zero-padded). The NN number is a session ID shared between the chat record
+// and its raw transcript — they pair by number, not by creation order. Each
+// chat record notes at the top whether a raw transcript exists for that
+// session. Note: you CANNOT reliably write history entries on autopilot —
+// handoffs are system-forced and unpredictable, so anything written from
+// memory after a handoff will have gaps. The user controls when history
+// entries are written.
+//
+// TASK LIST: Read src/task-list.md at the start of every session and at
+// every handoff. This is the active project management file — it tracks what
+// needs to be done (by priority), what's in progress right now, the backlog
+// of future ideas, and a completed archive. Keep it lean: title, priority,
+// status, one-liner only. Full context lives in the conversation history.
+// Update it whenever tasks change status — when you start a task, move it to
+// "In Progress"; when you finish one, move it to "Completed Archive". This
+// is a single living file (not version-controlled) — edit it in place.
+//
+// VERSION HISTORY: src/version-history.md is the dedicated file for the
+// version history of the code (index.html). Read it BEFORE making any code
+// changes so you know the current version number. You MUST update
+// src/version-history.md with every version change to the code — append a
+// new entry with the version number, a short title, and bulleted changes.
+// See the Version Control Policy in core-design-principles-v*.md for version
+// numbering rules (patch = trivial typos/formatting only; minor = new
+// content/sections/additions; major = structural reorganization). Also
+// update the "Current version" note in the index.html pointer comment when
+// the version changes.
+//
+// SESSION WRAP-UP: If the user signals they're wrapping up ("thanks", "I'm
+// done for now", "that's all for today", "goodbye", or similar closing
+// language), remind them: "Have you updated the conversation history
+// archive? I can append a session entry to src/Conversation-History/ now
+// if you'd like." Do this every time, even if it seems unnecessary — it's
+// easy to forget.
+//
+// BACKUP: When the user asks for a backup, bundle ALL workspace files into a
+// zip and attach it as a download. Include everything relevant: main.pjs,
+// index.html, all of src/ (including subfolders like Archive/ and
+// Core-Design-Principles/), imports/, scratch/, and any other files present.
+// Exclude only .tool-output/. Name the file
+// [projectname]-backup_YYYY-MM-DD_HHMM.zip using the current date and
+// timestamp. Use execute_js with @zip.js/zip.js to build the zip, then
+// attach_file to hand it to the user.
+
+$meta
+  title = [PROJECT TITLE]
+  description = [PROJECT DESCRIPTION]
+
+// Add plugin imports as needed, e.g.:
+// superFetch = {import:super-fetch-plugin}
+// generateText = {import:ai-text-plugin}
+// generateImage = {import:text-to-image-plugin}
+```
+
+---
+
+## Part 3: Core Design Principles Document Template
+
+Create this file as `src/core-design-principles-v01.00.md` for the first
+version. Fill in `[Project Name]` and the project-specific design sections as
+the project develops.
+
+```markdown
+# [Project Name] — Design Principles
+
+Created: [date]. Updated: [date]. v1.0
+
+> **AI Helper:** Read this document at the start of every session and at
+> every handoff. Do not change any design described here without direct user
+> approval.
+
+## Version Control Policy
+
+This document is under version control. Every edit creates a new version —
+previous versions are never overwritten.
+
+### File naming
+Files are named `core-design-principles-vXX.YY.ZZ.md`, where `XX.YY.ZZ` is the
+version number with **zero-padded** components (two digits each) in the
+**filename** for correct lexicographic sorting (e.g.
+`core-design-principles-v01.00.md`). The patch number `ZZ` may be omitted when
+zero (e.g. `v01.00` is equivalent to `v01.00.00`). Zero-padding is used **only
+in filenames** — version references in document text, headers, and version
+history use plain numbers (e.g. v1.0, not v01.00).
+
+### File location and archiving
+- The **latest version** lives at the **top level of `src/`**. The filename
+  includes the current version number.
+- **Previous versions** are archived in `src/Core-Design-Principles/` with
+  their version number in the filename.
+- The AI helper cannot delete or move files. To work around this, the
+  versioning workflow uses **archive-then-overwrite**: (1) copy the current
+  top-level file into the archive folder (preserving it with its version
+  number), then (2) overwrite the top-level file in place with the new
+  version's header and content changes. Since the old version is safely
+  archived first, overwriting is safe. No stale files are left behind.
+
+### When making changes
+1. **Check existing versions first**: Run `glob` for
+   `src/Core-Design-Principles/core-design-principles-v*.md` to see what
+   versions are archived. Also read the header of the top-level file to see
+   the current version number. The next version number must be one higher
+   (at the appropriate level — patch, minor, or major). NEVER assume the
+   next number — always verify.
+2. **Archive the current version**: Copy the current top-level file into
+   `src/Core-Design-Principles/` with its version number in the filename.
+   This preserves the old version before any changes.
+3. **Overwrite the top-level file in place**: Update the top-level file's
+   header with the new version number and "Updated" date, then make all
+   content changes directly in this file. The filename stays the same (with
+   the new version number). Since the old version is already safely
+   archived, overwriting the top-level copy is safe.
+4. **Never create new numbered files at the top level**: There should only
+   be ONE core-design-principles file at the top level of `src/` at any
+   time. Numbered versions live only in the archive folder.
+5. **Never edit an archived file**: Archived versions are frozen. All edits
+   go into the top-level file only.
+
+### Version numbering
+- **Patch** (increment the third number): Trivial fixes only — typos,
+  formatting, removing duplicates, small clarifications that don't change
+  meaning. e.g. v1.0 → v1.0.1 (filename: v01.00.01).
+- **Minor change** (increment the decimal): New sections, new content,
+  additions to existing sections, clarifications that change meaning, small
+  tweaks. Any change that adds information or alters the document's content
+  beyond a trivial typo. e.g. v1.0 → v1.1 (filename: v01.01), v1.99 → v2.0
+  (filename: v02.00).
+- **Major change** (increment the ones place): Substantial structural
+  changes, significant design decisions, large-scale reorganization. e.g.
+  v1.12 → v2.0 (filename: v02.00).
+- Update the "Updated" date to the actual date of the change.
+
+### Current version
+The latest version is the single core-design-principles file at the **top
+level of `src/`**. Previous versions are in `src/Core-Design-Principles/`.
+Always read the top-level file and edit it in place (after archiving the
+current version first, per the steps above).
+
+## Code Version History
+
+The version history of the code (index.html) is maintained in
+`src/version-history.md`.
+
+### Rules
+- **Update with every version change to the code**: When making code changes
+  to index.html, append a new entry to `src/version-history.md` with the
+  version number, a short title, and bulleted changes.
+- **Update the pointer comment**: The index.html file has a short pointer
+  comment at the top (`<!-- Version history: see src/version-history.md —
+  Current version: vX.YY -->`). Update the version number in this comment
+  when the version changes.
+- **Version numbering**: Follows the same rules as the design doc version
+  control (patch = trivial typos/formatting only; minor = new
+  content/sections/additions; major = structural reorganization). The code
+  version history is independent of the design doc version history — they
+  track different things.
+- **Living file**: `src/version-history.md` is a single living file (not
+  version-controlled like the design doc). Edit it in place — append new
+  entries at the bottom.
+
+---
+
+## Project Design
+
+> Fill in the sections below as the project develops. Not all sections may be
+> relevant to every project — adapt as needed. The key principle: document
+> design decisions, constraints, and architecture so future sessions don't
+> re-solve solved problems.
+
+### Key Terms
+[Define domain-specific vocabulary used throughout the project. Clear
+definitions prevent confusion and ensure the AI and user are aligned on
+terminology.]
+
+### Project Overview
+[What the project does, who it's for, what problem it solves. Include any
+relevant history or context about why the project exists.]
+
+### Architecture & Design
+[How the project works — data structures, state management, processing flow,
+key algorithms, key state variables, key functions with approximate line
+locations. This is the core reference for understanding the codebase.]
+
+### UI/UX Details
+[Visual design, color palette (with hex codes and color names), layout,
+interaction patterns, responsive behavior, UI state machines. Document the
+specific colors, sizes, and behaviors so the design stays consistent across
+sessions.]
+
+### Layer Architecture
+[Document the codebase's layer structure, bottom-to-top or top-to-bottom,
+with line number references (which will need updating as the code changes).
+Describe how data flows through the layers and how they interact.]
+
+### Known Issues & Tensions
+[Documented problems, architectural tensions, intended directions for
+resolution. Be honest about what's broken, what's fragile, and what direction
+the fix should go — so future sessions don't waste time re-discovering the
+same problems.]
+
+### Test Cases / References
+[Reference materials, URLs, or test cases for verifying different features
+and modes. Include any external resources that are useful for testing.]
+
+### Future Features
+[Planned but not yet built — keep as a wishlist with brief descriptions. Mark
+which are high priority vs. nice-to-have. This helps the AI understand the
+project's trajectory without implementing things prematurely.]
+
+---
+
+## Advice for AI Helper
+
+### General Interaction
+
+- Begin every message with a timestamp in Eastern Time in the format of "Jul
+  28, 2026 -- 3:20 pm ET". Don't guess or estimate the time. Check the date
+  or clock function to get the exact time in the specified time zone.
+- I prefer to discuss and confirm changes before implementation takes place.
+  Wait for me to give the go ahead before editing files.
+- I appreciate when you keep me up to date on the progress you're making and
+  what you're thinking. Don't disappear for minutes just thinking or reading
+  or evaluating with no comments or updates about how it's going, what you've
+  discovered, and the conclusions you're reaching. Don't constantly barrage
+  me, but keep me in the loop.
+- I'm not always giving you direct instruction I want you to act on
+  instantly; sometimes I'm just giving feedback and notes that I want you to
+  acknowledge, collect, and act upon at a later time.
+
+### Safety Check
+
+If ever I'm about to do anything major, extreme, foolish, stupid,
+catastrophic, irreversible — question me, and confirm if that's really what I
+want to do.
+```
+
+---
+
+## Part 4: Task List Template
+
+Create this file as `src/task-list.md`.
+
+```markdown
+# [Project Name] — Active Task List
+
+This is the working project management file. It tracks what needs to be done,
+what's in progress, and what's been completed. Full context for each task lives
+in the conversation history.
+
+## In Progress
+
+_Tasks being actively worked on right now._
+
+- [ ] _(none)_
+
+## Active Tasks
+
+_Tasks that need to be done, sorted by priority._
+
+### 🔴 Urgent — broken functionality, blocking normal use
+
+- [ ] _(none)_
+
+### 🟠 High — significant issues affecting user experience
+
+- [ ] _(none)_
+
+### 🟡 Medium — improvements that matter but aren't blocking
+
+- [ ] _(none)_
+
+### 🟢 Low — nice-to-haves, polish
+
+- [ ] _(none)_
+
+## Backlog
+
+_Ideas and future features not yet committed to._
+
+- [ ] _(none)_
+
+## Completed Archive
+
+_Finished tasks. Context in conversation history._
+
+- [x] _(none yet)_
+```
+
+---
+
+## Part 5: Version History Template
+
+Create this file as `src/version-history.md`.
+
+```markdown
+# [Project Name] — Code Version History
+
+This file tracks the version history of the code (index.html). It is a living
+file — edit in place, append new entries at the bottom. Update with every
+version change to the code.
+
+---
+
+## v1.0 — Initial Setup
+
+- Project system created (folder structure, main.pjs instructions, design
+  doc, task list, version history)
+```
+
+---
+
+## Part 6: Behavioral Protocol
+
+The following consolidated protocol captures how the AI helper should work
+with the user. These instructions are embedded in the main.pjs comment blocks
+and the design doc's Advice section — this section is a summary for quick
+reference.
+
+1. **Timestamps**: Begin every message with a fresh Eastern Time timestamp
+   ("Jul 30, 2026 -- 4:50 pm ET"). Use the Date object with America/New_York
+   timezone. Never reuse or copy a timestamp from a previous message.
+
+2. **Read before acting**: Read main.pjs, the latest design doc, all
+   conversation history files, and the task list before starting any work —
+   every session, every time, no exceptions. Even for simple tasks like
+   backups.
+
+3. **Discuss before implementing**: Prefer to discuss and confirm changes
+   before implementation. Wait for the user's go-ahead before editing files.
+   Don't start coding until the user says to.
+
+4. **Keep the user informed**: Keep the user up to date on progress,
+   discoveries, and conclusions. Don't disappear for long stretches with no
+   communication. Don't barrage them either — find a balance.
+
+5. **Acknowledge notes**: When the user gives feedback or notes, acknowledge
+   them, collect them, and wait for the go-ahead. Don't immediately act on
+   everything. Sometimes the user is giving feedback for later, not
+   instructions for now.
+
+6. **Safety check**: If about to do anything major, extreme, foolish, stupid,
+   catastrophic, or irreversible — question the user and confirm that's
+   really what they want.
+
+7. **Version control**: Follow the design doc's version control policy.
+   Archive before overwriting. Update version history with every code change.
+   Zero-pad version numbers in filenames for correct sorting.
+
+8. **Conversation history**: The user controls when history entries are
+   written. Don't attempt autopilot history writing — handoffs are
+   unpredictable and anything written from memory after a handoff will have
+   gaps. When the user asks for a history update, write a faithful
+   chronological narrative — not a condensed summary. Include dates and
+   timestamps throughout.
+
+9. **Task management**: Keep the task list lean. Move tasks to "In Progress"
+   when starting, to "Completed Archive" when done. Full context lives in
+   conversation history.
+
+10. **Session wrap-up**: When the user signals they're wrapping up, remind
+    them about the conversation history archive and offer to append a session
+    entry.
+
+11. **Backups**: When asked, bundle all workspace files into a zip (excluding
+    .tool-output/) and attach as a download. Name with date and timestamp.
+
+---
+
+## Part 7: Available Plugin Imports
+
+When asking the user which plugins the project needs, reference this list:
+
+| Import | What it does |
+|--------|-------------|
+| `superFetch = {import:super-fetch-plugin}` | Fetch any URL without CORS issues (proxy) |
+| `generateText = {import:ai-text-plugin}` | AI text generation (with streaming, vision support) |
+| `generateImage = {import:text-to-image-plugin}` | AI image generation at runtime |
+| `kv = {import:kv-plugin}` | Persistent storage (IndexedDB, survives reloads) |
+| `createServerSocket = {import:server-plugin}` | Realtime multiplayer server (WebSocket-compatible) |
+| `uploadPlugin = {import:upload-plugin}` | Upload files to a permanent URL |
+| `commentsPlugin = {import:comments-plugin}` | Comments/chat/guestbook widgets |
+| `secretPlugin = {import:secret-plugin}` | Synchronous public-key encryption |
+
+Add only the imports the project actually uses. Each import has a skill with
+full reference docs — load the skill before using non-trivial features.

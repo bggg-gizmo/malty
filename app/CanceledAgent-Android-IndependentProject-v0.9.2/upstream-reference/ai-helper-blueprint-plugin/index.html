@@ -1,0 +1,1403 @@
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #020817;
+    overflow: hidden;
+  }
+
+  .page-container {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .page-track {
+    will-change: transform;
+  }
+
+  .page-section {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Futuristic blueprint grid background */
+  .blueprint-bg {
+    position: fixed;
+    inset: 0;
+    background-color: #020817;
+    background-image:
+      linear-gradient(rgba(30, 90, 200, 0.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 90, 200, 0.18) 1px, transparent 1px),
+      linear-gradient(rgba(30, 90, 200, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 90, 200, 0.08) 1px, transparent 1px);
+    background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+    z-index: 0;
+  }
+
+  /* Radial glow behind the title */
+  .blueprint-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(20, 60, 180, 0.35) 0%, transparent 60%);
+  }
+
+  .blueprint-stack {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+    text-align: center;
+  }
+
+  .blueprint-subtitle {
+    margin: 0;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    color: #60a5fa;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-shadow: 0 0 8px rgba(30, 90, 220, 0.6);
+  }
+
+  .blueprint-instruction {
+    margin: 0.6em 0 0;
+    width: 90%;
+    max-width: 640px;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.7rem, 1.8vw, 1.1rem);
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: rgba(147, 197, 253, 0.75);
+    line-height: 1.5;
+  }
+
+  /* Plugin install card on the first page */
+  .install-card {
+    margin-top: 1.3em;
+    width: 92%;
+    max-width: 680px;
+    padding: 1em 1.2em;
+    background: rgba(8, 22, 54, 0.72);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    border-radius: 10px;
+    box-shadow:
+      0 0 26px rgba(20, 60, 180, 0.35),
+      inset 0 0 34px rgba(20, 60, 180, 0.12);
+    text-align: left;
+  }
+
+  .install-label {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.7);
+    margin: 0 0 0.75em;
+  }
+
+  .install-code {
+    margin: 0;
+    padding: 0.8em 0.9em;
+    background: rgba(2, 8, 23, 0.85);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+
+  .install-code code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: clamp(0.62rem, 2.9vw, 0.98rem);
+    color: #bfdbfe;
+    white-space: pre-wrap;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+
+  .install-code .code-token {
+    white-space: nowrap;
+  }
+
+  .install-note {
+    margin: 0.85em 0 0;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.68rem, 1.6vw, 0.9rem);
+    font-weight: 300;
+    color: rgba(147, 197, 253, 0.8);
+    line-height: 1.55;
+  }
+
+  .install-note code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.92em;
+    color: #bfdbfe;
+    background: rgba(30, 90, 200, 0.18);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    border-radius: 4px;
+    padding: 0.05em 0.35em;
+  }
+
+  @media (max-width: 520px) {
+    .install-card { padding: 0.9em 0.85em; }
+    .install-code { padding: 0.75em 0.7em; }
+    .install-label { letter-spacing: 0.14em; }
+    .install-code code {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .install-code .code-token { padding-left: 1.5em; }
+  }
+
+  .blueprint-title {
+    margin: 0;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(3rem, 12vw, 9rem);
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: #3b82f6;
+    text-transform: uppercase;
+    animation: pulse 4.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    text-shadow:
+      0 0 8px rgba(30, 90, 220, 0.9),
+      0 0 24px rgba(30, 90, 220, 0.7),
+      0 0 60px rgba(20, 60, 180, 0.6);
+  }
+
+  .blueprint-credit {
+    margin: -0.2em 0 0;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: rgba(163, 205, 255, 0.62);
+  }
+
+  .blueprint-credit a {
+    color: rgba(163, 205, 255, 0.72);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(147, 197, 253, 0.45);
+  }
+
+  .blueprint-credit a:hover {
+    color: rgba(191, 219, 254, 0.95);
+    border-bottom-color: rgba(191, 219, 254, 0.8);
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.82;
+      text-shadow:
+        0 0 8px rgba(30, 90, 220, 0.8),
+        0 0 24px rgba(30, 90, 220, 0.5),
+        0 0 50px rgba(20, 60, 180, 0.4);
+    }
+    50% {
+      opacity: 1;
+      text-shadow:
+        0 0 14px rgba(60, 130, 255, 1),
+        0 0 44px rgba(40, 110, 240, 0.85),
+        0 0 100px rgba(30, 90, 220, 0.75);
+    }
+  }
+
+  /* Short viewports: keep the stack clear of the Learn More arrow */
+  @media (max-height: 760px) {
+    .blueprint-stack { gap: 0.35em; }
+    .blueprint-title { font-size: clamp(2.4rem, 9vw, 6rem); }
+    .blueprint-credit { margin-top: -0.1em; }
+    .install-card { margin-top: 1em; }
+    .blueprint-instruction { margin-top: 0.4em; }
+    .learn-more { bottom: 1.2rem; }
+  }
+
+  @media (max-height: 620px) {
+    .blueprint-title { font-size: clamp(1.9rem, 7vw, 4rem); }
+    .blueprint-subtitle { font-size: clamp(0.7rem, 2vw, 1.1rem); }
+    .blueprint-stack { gap: 0.28em; }
+    .install-card { margin-top: 0.8em; padding: 0.85em 0.9em; }
+    .install-label { margin-bottom: 0.55em; }
+    .install-code { padding: 0.7em 0.8em; }
+    .install-code code { font-size: clamp(0.55rem, 2.4vw, 0.8rem); }
+    .install-note { font-size: clamp(0.6rem, 1.4vw, 0.8rem); }
+    .install-note { margin-top: 0.7em; }
+    .blueprint-instruction { margin-top: 0.3em; font-size: clamp(0.65rem, 1.5vw, 0.95rem); }
+    .learn-more { bottom: 0.6rem; }
+  }
+
+  /* Learn More arrow */
+  .learn-more {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4em;
+    cursor: pointer;
+    color: rgba(147, 197, 253, 0.6);
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  .learn-more:hover {
+    color: rgba(147, 197, 253, 1);
+  }
+
+  .learn-more svg {
+    width: 28px;
+    height: 28px;
+    filter: drop-shadow(0 0 6px rgba(30, 90, 220, 0.7));
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(10px); }
+  }
+
+  /* Second page content */
+.page-section.info-section {
+    justify-content: flex-start;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.45) transparent;
+  }
+
+  .info-section::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .info-section::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.45);
+    border-radius: 3px;
+  }
+
+  .info-content {
+    z-index: 1;
+    max-width: 720px;
+    width: 90%;
+    margin: auto;
+    padding: 0.35rem 0;
+    text-align: center;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .info-content h2 {
+    font-size: clamp(1.4rem, 4vw, 2.4rem);
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: #60a5fa;
+    text-transform: uppercase;
+    margin: 0 0 1.1em;
+    text-shadow: 0 0 12px rgba(30, 90, 220, 0.6);
+  }
+
+  .info-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.95em;
+    text-align: left;
+  }
+
+  .info-content li {
+    font-size: clamp(0.82rem, 1.8vw, 1.06rem);
+    font-weight: 300;
+    color: rgba(147, 197, 253, 0.85);
+    line-height: 1.5;
+    padding-left: 1.8em;
+    position: relative;
+  }
+
+  .info-content li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 8px;
+    height: 8px;
+    background: #3b82f6;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+  }
+
+  .info-content li strong {
+    color: #93c5fd;
+    font-weight: 500;
+  }
+
+  .info-content code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9em;
+    color: #bfdbfe;
+    background: rgba(30, 90, 200, 0.18);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    white-space: nowrap;
+  }
+
+  .info-content code.wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Live embed of the canonical master generator, at the bottom of page 2 */
+  .master-embed {
+    margin: 2.4em 0 0;
+    text-align: center;
+  }
+
+  .master-embed-label {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.7);
+    margin: 0 0 0.7em;
+  }
+
+  .master-frame {
+    position: relative;
+    width: 100%;
+    height: clamp(300px, 60vh, 540px);
+    background: rgba(2, 8, 23, 0.85);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow:
+      0 0 26px rgba(20, 60, 180, 0.35),
+      inset 0 0 34px rgba(20, 60, 180, 0.12);
+  }
+
+  .master-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .master-embed-note {
+    margin: 0.85em 0 0;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.66rem, 1.6vw, 0.88rem);
+    font-weight: 300;
+    color: rgba(147, 197, 253, 0.75);
+    line-height: 1.55;
+  }
+
+  .master-embed-note a {
+    color: #93c5fd;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(147, 197, 253, 0.6);
+  }
+
+  .master-embed-note a:hover {
+    color: #dbeafe;
+    border-bottom-color: rgba(219, 234, 254, 0.85);
+  }
+
+  .back-to-top {
+    margin: 1.8em auto 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.55em 1.15em;
+    background: rgba(8, 22, 54, 0.72);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    border-radius: 999px;
+    color: rgba(147, 197, 253, 0.85);
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.62rem, 1.5vw, 0.8rem);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .back-to-top:hover {
+    color: #dbeafe;
+    border-color: rgba(96, 165, 250, 0.75);
+    box-shadow: 0 0 18px rgba(37, 99, 235, 0.45);
+  }
+
+  /* Mode builder — choose mode + sub-modes + overlays, copy the prompt */
+  .builder {
+    margin: 0 0 2.6em;
+    padding: 1.1em 1.2em 1.2em;
+    background: rgba(8, 22, 54, 0.72);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    border-radius: 10px;
+    box-shadow:
+      0 0 26px rgba(20, 60, 180, 0.35),
+      inset 0 0 34px rgba(20, 60, 180, 0.12);
+    text-align: left;
+  }
+
+  .builder-label {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.7);
+    margin: 0 0 0.8em;
+  }
+
+  .builder-editoronly {
+    margin-left: 0.5em;
+    padding: 0.12em 0.5em;
+    border: 1px solid rgba(96, 165, 250, 0.5);
+    border-radius: 999px;
+    color: rgba(147, 197, 253, 0.8);
+    font-size: 0.82em;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+
+  .builder-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45em;
+    align-items: center;
+    margin: 0.5em 0;
+  }
+
+  .builder-key {
+    flex: 0 0 auto;
+    min-width: 6.4em;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.6rem, 1.4vw, 0.76rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.55);
+  }
+
+  .chip {
+    cursor: pointer;
+    font: inherit;
+    font-size: clamp(0.66rem, 1.6vw, 0.86rem);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    padding: 0.42em 0.8em;
+    background: rgba(2, 8, 23, 0.7);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 999px;
+    color: rgba(191, 219, 254, 0.85);
+    transition: color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .chip:hover {
+    border-color: rgba(96, 165, 250, 0.7);
+    color: #dbeafe;
+  }
+
+  .chip.on {
+    background: rgba(37, 99, 235, 0.32);
+    border-color: rgba(96, 165, 250, 0.85);
+    color: #e0f2fe;
+    box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
+  }
+
+  .builder-out {
+    margin: 1em 0 0;
+    padding: 0.85em 0.95em;
+    background: rgba(2, 8, 23, 0.88);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    border-radius: 8px;
+    color: #bfdbfe;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: clamp(0.58rem, 1.5vw, 0.78rem);
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 15em;
+    overflow: auto;
+  }
+
+  .builder-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    align-items: center;
+    margin-top: 0.9em;
+  }
+
+  .build-btn {
+    cursor: pointer;
+    font: inherit;
+    font-size: clamp(0.62rem, 1.5vw, 0.8rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    padding: 0.62em 1.1em;
+    border-radius: 999px;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    background: rgba(8, 22, 54, 0.72);
+    color: rgba(147, 197, 253, 0.85);
+    transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .build-btn:hover {
+    color: #dbeafe;
+    border-color: rgba(96, 165, 250, 0.75);
+    box-shadow: 0 0 18px rgba(37, 99, 235, 0.45);
+  }
+
+  .build-btn.primary {
+    background: rgba(37, 99, 235, 0.9);
+    border-color: #3b82f6;
+    color: #fff;
+  }
+
+  .build-btn.primary:hover {
+    background: #2563eb;
+  }
+
+  .builder-toast {
+    font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+    color: #7ee2a8;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .builder-toast.show {
+    opacity: 1;
+  }
+
+  .master-status {
+    margin: 0.8em 0 0;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(0.6rem, 1.4vw, 0.78rem);
+    color: rgba(147, 197, 253, 0.6);
+    text-align: left;
+  }
+
+  .master-status b {
+    color: #93c5fd;
+    font-weight: 500;
+  }
+
+  /* Editor-only picture-in-picture: the plugin catalog / inspector */
+  .bp-pip {
+    position: fixed;
+    z-index: 2147483200;
+    left: 12px;
+    bottom: 12px;
+    width: min(520px, 92vw);
+    background: #14161c;
+    color: #e9ebf1;
+    border: 1px solid #3f6cff;
+    border-radius: 14px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .bp-pip-head {
+    cursor: move;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 9px 10px;
+    background: #232842;
+    border-bottom: 1px solid #323a52;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+
+  .bp-pip-title {
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bp-pip-sub {
+    font-size: 11px;
+    color: #9aa3b8;
+    white-space: nowrap;
+  }
+
+  .bp-pip-btns {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+  }
+
+  .bp-pip-btn {
+    cursor: pointer;
+    border: 1px solid #3a4563;
+    background: #2a3350;
+    color: #fff;
+    border-radius: 8px;
+    padding: 3px 9px;
+    font-size: 12px;
+    text-decoration: none;
+    line-height: 1.5;
+  }
+
+  .bp-pip-body {
+    display: none;
+    flex-direction: column;
+    height: 58vh;
+  }
+
+  .bp-pip.open .bp-pip-body {
+    display: flex;
+  }
+
+  .bp-pip.big {
+    width: min(1100px, 94vw);
+  }
+
+  .bp-pip.big .bp-pip-body {
+    height: min(84vh, 880px);
+  }
+
+  .bp-pip-frame {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    border: 0;
+    display: block;
+    background: #0e1118;
+  }
+
+  .bp-pip-note {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #9aa3b8;
+    background: #14161c;
+    border-top: 1px solid #323a52;
+  }
+
+  .bp-pip-note a {
+    color: #8fd0ff;
+  }
+
+  .bp-pip-note b {
+    color: #c8d0e4;
+  }
+
+  .bp-pip-bubble {
+    position: fixed;
+    z-index: 2147483200;
+    left: 12px;
+    bottom: 12px;
+    cursor: pointer;
+    border: 1px solid #3f6cff;
+    background: #232842;
+    color: #fff;
+    border-radius: 999px;
+    padding: 9px 14px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  }
+</style>
+
+<div class="blueprint-bg"></div>
+<div class="page-container" id="pageContainer">
+  <div class="page-track" id="pageTrack">
+  <section class="page-section">
+    <div class="blueprint-stack">
+      <h2 class="blueprint-subtitle">Perchance AI Helper</h2>
+      <h1 class="blueprint-title">Blueprint</h1>
+      <p class="blueprint-credit">Based on the ai-helper-blueprint generator by Nathan P — master: <a href="https://perchance.org/ai-helper-blueprint" target="_blank" rel="noopener noreferrer">perchance.org/ai-helper-blueprint</a></p>
+
+      <div class="install-card">
+        <div class="install-label">Add it to your project as a plugin</div>
+        <pre class="install-code"><code id="installCodeEl"></code></pre>
+        <p class="install-note">Put that line in your project's <code>main.pjs</code>, with the pointer block from <code>src/adopt-main-snippet.pjs</code> above it. Perchance mirrors the plugin into the project's workspace, so no file copying — the session reads the blueprint from there.</p>
+      </div>
+      <p class="blueprint-instruction">Or point a new AI Helper session here and say:<br>"Load the AI Helper Blueprint Plugin and execute the instructions in its main.pjs."</p>
+    </div>
+    <div class="learn-more" onclick="scrollToPage(1)">
+      <span>Learn More</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <polyline points="5 12 12 19 19 12"></polyline>
+      </svg>
+    </div>
+  </section>
+  <section class="page-section info-section">
+    <div class="info-content">
+      <div class="builder" id="modeBuilder" style="display:none">
+        <div class="builder-label">Build your mode — pick it, then paste the prompt <span class="builder-editoronly">editor only</span></div>
+        <div class="builder-row" id="modeRow">
+          <span class="builder-key">Base mode</span>
+        </div>
+        <div class="builder-row" id="subRow">
+          <span class="builder-key">Sub-modes</span>
+        </div>
+        <div class="builder-row" id="overlayRow">
+          <span class="builder-key">Overlays</span>
+        </div>
+        <pre class="builder-out" id="promptOut"></pre>
+        <div class="builder-actions">
+          <button class="build-btn primary" id="copyPromptBtn" type="button">📋 Copy activation prompt</button>
+          <button class="build-btn" id="copyImportsBtn" type="button">Copy import lines</button>
+          <span class="builder-toast" id="buildToast"></span>
+        </div>
+        <div class="master-status" id="masterStatus">master: checking the live version…</div>
+      </div>
+      <h2>What Is the Blueprint?</h2>
+      <ul>
+        <li><strong>A behavioral protocol for AI sessions.</strong> The blueprint gives the AI a consistent set of rules to follow — design principles, file management, conversation history, and task tracking.</li>
+        <li><strong>Two operating modes.</strong> Core mode for quick, lightweight sessions. Full mode for long-term projects that accumulate context worth keeping across sessions.</li>
+        <li><strong>Three stackable sub-modes.</strong> On top of either mode, a session can stack capability layers — <code>image editor</code> (raster editor: layers, selection, filters, AI generation — with a painting surface of 1100 brushes in named brushsets, palettes, papers and a bakeable relighting pass, merged in from the canvas extension), <code>3D editor</code> (three.js studio + animation lab, plus the human cast merged in from the Human 3D editor extension: 77 rigged humans behind a scriptable <code>window.CharacterAPI</code> — cast, pose, material, lighting, clip, camera, screenshot, share link — and a paint-on-the-mesh texture studio), and <code class="wrap">tilemap and sprite editor</code> (a sprite/tileset workbench with a scriptable pixel engine: sheet splitting, atlases with frame metadata, retro palettes, SVG tracing, GIF/APNG, and SpriteFusion tilemap round-trips). They combine freely, e.g. <code class="wrap">Full-image editor-tilemap and sprite editor</code>.</li>
+        <li><strong>Three overlays — git, thinking and plugins — all on by default.</strong> Overlays ship with this plugin rather than the master. <strong>Git</strong> is the default working discipline: the project is a versioned codebase from the first commit, so the AI clones it, commits each meaningful change with a message, and shows history and diffs — that is what keeps steering and control on by default. <strong>Thinking</strong> puts the AI helper's reasoning in a picture-in-picture window beside the output as a unified pipeline (each entry sequenced, typed and linked to its parent, with trace and export): since the model provider no longer shows you its reasoning, this window is where the thinking lives — you rate pivots 👍/👎, revert a linked change, and copy the ratings out as instructions for the next step. <strong>Back-thinking is part of it:</strong> the pipeline starts when the overlay does, so reasoning you can already see — whatever the provider does show, and the rounds that happened before the log existed — is mirrored into the same chain <em>verbatim</em> (never summarized) with <code>root.aiThinkVerbatim</code> for a visible block and <code>root.aiThinkBackfill</code> for whole earlier rounds, which renumbers and chains them so the trace reads as one line of thought. <strong>Plugins</strong> carries the offline catalog of every Perchance plugin — 195 of them, with source, declared imports and exposed names — plus the browsing inspector as a PiP window whose per-plugin toggles copy ready-to-paste import lines, and a no-import registry the AI can query with no setup at all. The two windowed overlays appear only while editing: a published page renders neither, so no thought text or catalog keeps loading there.</li>
+        <li><strong>Self-documenting.</strong> Conversation history, task lists, and version history are maintained in src/ so nothing is lost between sessions.</li>
+        <li><strong>Installable as a plugin.</strong> Any project can run it by importing <code>ai-helper-blueprint-plugin</code> and pointing its main.pjs at the mirrored copy — no file copying, and updates arrive with the plugin.</li>
+        <li><strong>Easy to use.</strong> Just point a new AI Helper session at this generator and tell it to read main.pjs. The blueprint handles the rest.</li>
+        <li><strong>Prompt-driven.</strong> The plugin page's mode builder (editor view only) writes a paste-ready activation prompt — mode, sub-modes, overlays, and the exact install lines — so a new session starts configured instead of being asked, and the live text resolver means it always pulls the newest blueprint rather than a frozen copy.</li>
+      </ul>
+      <div class="master-embed">
+        <div class="master-embed-label">The master blueprint — live</div>
+        <div class="master-frame">
+          <iframe
+            src="https://null.perchance.org/ai-helper-blueprint"
+            title="Perchance AI Helper Blueprint — the canonical master generator"
+            loading="lazy"
+            allow="clipboard-write"></iframe>
+        </div>
+        <p class="master-embed-note">The canonical master, running live above: <a href="https://perchance.org/ai-helper-blueprint" target="_blank" rel="noopener noreferrer">perchance.org/ai-helper-blueprint</a>. This plugin is a copy of it — the master is where the blueprint itself lives, and where it is updated.</p>
+        <button class="back-to-top" type="button" onclick="scrollToPage(0)">▲ Back to top</button>
+      </div>
+      <div class="thinking-anchor">[aiThinking({key:"blueprint", title:"Blueprint thinking"})]</div>
+    </div>
+  </section>
+  </div>
+</div>
+<script>
+  (function() {
+    const container = document.getElementById('pageContainer');
+    const track = document.getElementById('pageTrack');
+    const sections = track.querySelectorAll('.page-section');
+    const numPages = sections.length;
+    let currentPage = 0;
+    let isScrolling = false;
+    let touchStartY = null;
+
+    function viewportH() {
+      return container.clientHeight || window.innerHeight;
+    }
+
+    function applyTrackTransform() {
+      track.style.transform = 'translateY(' + (-currentPage * viewportH()) + 'px)';
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function scrollToPage(pageIndex) {
+      if (pageIndex < 0 || pageIndex >= numPages || pageIndex === currentPage) return;
+      if (isScrolling) return;
+      isScrolling = true;
+      const startY = -currentPage * viewportH();
+      const endY = -pageIndex * viewportH();
+      const duration = 450;
+      const startTime = performance.now();
+
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeInOutCubic(progress);
+        const y = startY + (endY - startY) * eased;
+        track.style.transform = 'translateY(' + y + 'px)';
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          currentPage = pageIndex;
+          isScrolling = false;
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    window.scrollToPage = scrollToPage;
+
+    (function buildInstallCode() {
+      const codeEl = document.getElementById('installCodeEl');
+      if (!codeEl) return;
+      const LB = String.fromCharCode(123);
+      const RB = String.fromCharCode(125);
+      const token = document.createElement('span');
+      token.className = 'code-token';
+      token.textContent = LB + 'import:ai-helper-blueprint-plugin' + RB;
+      codeEl.textContent = 'blueprintProtocol = ';
+      codeEl.appendChild(token);
+    })();
+
+    let lastWheel = 0;
+    function sectionScroller() {
+      const section = sections[currentPage];
+      return {
+        down: section.scrollHeight - section.clientHeight - section.scrollTop > 1,
+        up: section.scrollTop > 1,
+        section
+      };
+    }
+
+    container.addEventListener('wheel', function(e) {
+      if (isScrolling) return;
+      const s = sectionScroller();
+      if (e.deltaY > 0 && s.down) return;
+      if (e.deltaY < 0 && s.up) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - lastWheel < 150) return;
+      if (e.deltaY > 15) { lastWheel = now; scrollToPage(currentPage + 1); }
+      else if (e.deltaY < -15) { lastWheel = now; scrollToPage(currentPage - 1); }
+    }, { passive: false });
+
+    container.addEventListener('touchstart', function(e) {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    container.addEventListener('touchend', function(e) {
+      if (isScrolling || touchStartY === null) return;
+      const touchEndY = e.changedTouches[0].clientY;
+      const diff = touchStartY - touchEndY;
+      touchStartY = null;
+      const s = sectionScroller();
+      if (diff > 50) { if (!s.down) scrollToPage(currentPage + 1); }
+      else if (diff < -50) { if (!s.up) scrollToPage(currentPage - 1); }
+    }, { passive: true });
+
+    window.addEventListener('keydown', function(e) {
+      if (isScrolling) return;
+      const tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable)) return;
+      const dir = (e.key === 'ArrowDown' || e.key === 'PageDown') ? 1
+        : (e.key === 'ArrowUp' || e.key === 'PageUp') ? -1 : 0;
+      if (!dir) return;
+      e.preventDefault();
+      const s = sectionScroller();
+      if (dir === 1 && s.down) { s.section.scrollTop += s.section.clientHeight * 0.8; return; }
+      if (dir === -1 && s.up) { s.section.scrollTop -= s.section.clientHeight * 0.8; return; }
+      scrollToPage(currentPage + dir);
+    });
+
+    window.addEventListener('resize', function() {
+      if (!isScrolling) applyTrackTransform();
+    });
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(function() {
+        if (!isScrolling) applyTrackTransform();
+      }).observe(container);
+    }
+  })();
+</script>
+<script>
+  // ── Mode builder: pick base mode + sub-modes + overlays, copy the prompt ────
+  (function () {
+    var SUBS = ["image editor", "3D editor", "tilemap and sprite editor"];
+    var OVERLAYS = ["git", "thinking", "plugins"];
+    var STATE_KEY = "blueprint-mode-builder:v2";
+    // Import lines are built at runtime, because a literal import block in this
+    // file would be picked up by the engine's import scanner (see src/README.md).
+    var LB = String.fromCharCode(123);
+    var RB = String.fromCharCode(125);
+    function imp(pair) { return pair[0] + " = " + LB + "import:" + pair[1] + RB; }
+    var PROTOCOL = ["blueprintProtocol", "ai-helper-blueprint-plugin"];
+    var THINKING = ["aiThinking", "canceled-ai-helper-thinking-plugin"];
+    var GIT = ["canvasEditor", "canceled-codebase-generator-plugin"];
+    var SUB_IMPORTS = {
+      "image editor": [
+        ["generateImage", "text-to-image-plugin"],
+        ["superFetch", "super-fetch-plugin"],
+        ["kv", "kv-plugin"],
+        ["uploadPlugin", "upload-plugin"],
+        ["touchscreen", "canceled-touchscreen-api-plugin"]
+      ],
+      "3D editor": [
+        ["superFetch", "super-fetch-plugin"],
+        ["uploadPlugin", "upload-plugin"],
+        ["generateText", "ai-text-plugin"],
+        ["generateImage", "text-to-image-plugin"]
+      ],
+      "tilemap and sprite editor": [
+        ["superFetch", "super-fetch-plugin"],
+        ["uploadPlugin", "upload-plugin"],
+        ["sprite", "sprite-plugin"]
+      ]
+    };
+    var SUB_ADOPT = {
+      "image editor": "adopt the engine from perchance.org/image-editor-tool, plus the painting surface from perchance.org/canceled-canvas-extension (src/studio.js + src/agent.js + src/AGENT.md + src/sk-catalog.js + src/palettes.js + the brush images the project ships)",
+      "3D editor": "adopt src/studio/*.js from perchance.org/3d-lab, plus the human cast from perchance.org/canceled-human-3d-editor-extension (src/cc/*.js + src/models/*.glb + index.json + CREDITS.txt + src/character-api-examples.json)",
+      "tilemap and sprite editor": "adopt src/api.js + src/core/*.js from perchance.org/canceled-sprite-lab"
+    };
+
+    var state = (function () {
+      try {
+        var raw = JSON.parse(localStorage.getItem(STATE_KEY) || "null");
+        if (raw && typeof raw === "object") {
+          return {
+            mode: raw.mode === "Core" ? "Core" : "Full",
+            subs: Array.isArray(raw.subs) ? raw.subs.filter(function (s) { return SUBS.indexOf(s) >= 0; }) : [],
+            overlays: Array.isArray(raw.overlays) ? raw.overlays.filter(function (o) { return OVERLAYS.indexOf(o) >= 0; }) : OVERLAYS.slice()
+          };
+        }
+      } catch (e) {}
+      return { mode: "Full", subs: [], overlays: OVERLAYS.slice() };
+    })();
+
+    function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (e) {} }
+    function chosenSubs() { return SUBS.filter(function (s) { return state.subs.indexOf(s) >= 0; }); }
+    function chosenOverlays() { return OVERLAYS.filter(function (o) { return state.overlays.indexOf(o) >= 0; }); }
+    function modeName() {
+      var subs = chosenSubs();
+      return subs.length ? state.mode + "-" + subs.join("-") : state.mode;
+    }
+
+    function buildPrompt() {
+      var name = modeName();
+      var ov = chosenOverlays();
+      var subs = chosenSubs();
+      var L = [];
+      L.push("=== AI HELPER BLUEPRINT \u2014 ACTIVATION ===");
+      L.push("Load the AI Helper Blueprint Plugin and execute the instructions in its main.pjs");
+      L.push("(mirrored into this project as imports/ai-helper-blueprint-plugin/main.pjs).");
+      L.push("");
+      L.push("Mode: " + name);
+      L.push("Overlays: " + (ov.length ? ov.join(", ") : "none"));
+      L.push("");
+      L.push("Before the first task:");
+      L.push("1. Pull the NEWEST blueprint text, live \u2014 never trust a frozen key:");
+      L.push("     https://perchance.org/api/getGeneratorsAndDependencies?generatorNames=ai-helper-blueprint");
+      L.push("   -> the master's \"code\" field contains its current quick-path key URL");
+      L.push("   -> download https://user.uploads.dev/file/<key>.txt and read it.");
+      L.push("   This project's text is \"master vX.Y + its own LOCAL ADDITIONS list\" (see src/).");
+      L.push("   Then run the REBASE CHECK in the provenance section and say if the master moved.");
+      L.push("2. Protocol install \u2014 paste the pointer block from src/adopt-main-snippet.pjs at the top of");
+      L.push("   main.pjs, then add:");
+      L.push("     " + imp(PROTOCOL));
+      L.push("3. Overlays (part of the plugin, on by default \u2014 not sub-modes):");
+      if (ov.indexOf("git") >= 0) {
+        L.push("     git: " + imp(GIT));
+        L.push("       DEFAULT working discipline \u2014 the project is a versioned codebase: clone it,");
+        L.push("       commit each meaningful change with a short message (author: \"ai\"), and read");
+        L.push("       history/diffs with root.canvasEditor instead of asking what happened. A commit");
+        L.push("       is a working snapshot, never a publication \u2014 only the user saves.");
+      }
+      if (ov.indexOf("thinking") >= 0) {
+        L.push("     thinking: " + imp(THINKING));
+        L.push("       the unified thought pipeline as a PiP beside the output (editor only). The provider");
+        L.push("       no longer shows the user your reasoning, so this window is where it lives: push each");
+        L.push("       step with h.think(\"...\") / h.act(\"...\") / h.pipe({kind:\"change\",...}) as you work,");
+        L.push("       and read the ratings (with thinking IDs + TRACE-BACK) via window.getHelperFeedback().");
+        L.push("       Back-thinking: anything the user can already SEE you reason (the provider is showing");
+        L.push("       it) is mirrored in VERBATIM \\u2014 root.aiThinkVerbatim(text, {key, turn}) \\u2014 never a");
+        L.push("       summary; reasoning from rounds that happened BEFORE the log existed is back-filled");
+        L.push("       with root.aiThinkBackfill([{turn, at, entries:[{kind, text}, ...]}, ...], {key}),");
+        L.push("       oldest round first - for rounds that are already over. A round still happening goes");
+        L.push("       through the ordinary log/think/act calls, or {position:\"over\"} to append on top.");
+        L.push("       Never invent a round that is no longer recoverable.");
+      }
+      if (ov.indexOf("plugins") >= 0) {
+        L.push("     plugins: no import of its own \u2014 consult the catalog before installing anything:");
+        L.push("       window.perchancePluginTools (or the inspector PiP on this plugin's page) to search,");
+        L.push("       read a plugin's source, and copy its import lines. For the offline catalog, adopt");
+        L.push("       src/plugin-tools.js + src/plugins/index.json from");
+        L.push("       perchance.org/i-am-canceled-presents-all-of-the-plugins.");
+      }
+      if (!ov.length) L.push("     none chosen");
+      L.push("4. Sub-modes \u2014 install each chosen one as its SUB-MODES section describes:");
+      if (!subs.length) {
+        L.push("     none chosen");
+      } else {
+        subs.forEach(function (s) {
+          L.push("     " + s + ":");
+          SUB_IMPORTS[s].forEach(function (pair) { L.push("       " + imp(pair)); });
+          L.push("       + " + SUB_ADOPT[s]);
+        });
+      }
+      L.push("");
+      L.push("Then work under Mode: " + name + ".");
+      L.push("=== END ACTIVATION ===");
+      return L.join("\n");
+    }
+
+    function buildImports() {
+      var ov = chosenOverlays();
+      var subs = chosenSubs();
+      var out = [];
+      out.push("// Blueprint plugin (protocol)");
+      out.push(imp(PROTOCOL));
+      out.push("");
+      out.push("// Overlays (part of the plugin, not sub-modes)");
+      if (ov.indexOf("git") >= 0) out.push(imp(GIT));
+      if (ov.indexOf("thinking") >= 0) out.push(imp(THINKING));
+      if (ov.indexOf("plugins") >= 0) out.push("// plugins: no import \u2014 adopt src/plugin-tools.js + src/plugins/index.json for the offline catalog");
+      if (!ov.length) out.push("// (no overlays selected)");
+      out.push("");
+      out.push("// Sub-modes");
+      var seen = {};
+      var any = false;
+      subs.forEach(function (s) {
+        out.push("// " + s);
+        SUB_IMPORTS[s].forEach(function (pair) {
+          var line = imp(pair);
+          if (!seen[line]) { seen[line] = true; out.push(line); any = true; }
+        });
+      });
+      if (!any) out.push("// (no sub-modes selected)");
+      return out.join("\n");
+    }
+
+    function toast(msg) {
+      var el = document.getElementById("buildToast");
+      if (!el) return;
+      el.textContent = msg;
+      el.className = "builder-toast show";
+      setTimeout(function () { el.className = "builder-toast"; }, 2600);
+    }
+
+    function copyText(text, okMsg) {
+      function done(ok) {
+        if (ok) { toast(okMsg); return; }
+        selectPromptText();
+        toast("Clipboard blocked here \u2014 the prompt is selected; press Ctrl/Cmd+C.");
+      }
+      function legacy() {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "-1000px";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { ta.setSelectionRange(0, ta.value.length); } catch (e) {}
+        var ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        ta.remove();
+        done(ok);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, legacy);
+      } else {
+        legacy();
+      }
+    }
+
+    function selectPromptText() {
+      var out = document.getElementById("promptOut");
+      if (!out || !window.getSelection) return;
+      try {
+        var range = document.createRange();
+        range.selectNodeContents(out);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } catch (e) {}
+    }
+
+    function logThought(text) {
+      try { if (typeof window.logAiThought === "function") window.logAiThought(text, { pivot: false }); } catch (e) {}
+    }
+
+    function chipEl(label, on, onPick) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip" + (on ? " on" : "");
+      b.textContent = label;
+      b.addEventListener("click", onPick);
+      return b;
+    }
+
+    function clearChips(row) {
+      if (!row) return;
+      Array.prototype.slice.call(row.querySelectorAll(".chip")).forEach(function (n) { n.remove(); });
+    }
+
+    // The builder is editor-only, like the overlays: it exists for the moment a
+    // session is started, and a published page shows no builder at all.
+    var builderEl = document.getElementById("modeBuilder");
+    function renderBuilder() {
+      if (!builderEl) return;
+      builderEl.style.display = isEditorView() ? "" : "none";
+    }
+
+    function render() {
+      var modeRow = document.getElementById("modeRow");
+      var subRow = document.getElementById("subRow");
+      var overlayRow = document.getElementById("overlayRow");
+      if (!modeRow) return;
+      clearChips(modeRow);
+      ["Core", "Full"].forEach(function (m) {
+        modeRow.appendChild(chipEl(m === "Core" ? "Core \u2014 quick" : "Full \u2014 long-term", state.mode === m, function () {
+          state.mode = m;
+          saveState();
+          render();
+        }));
+      });
+      clearChips(subRow);
+      SUBS.forEach(function (s) {
+        subRow.appendChild(chipEl(s, state.subs.indexOf(s) >= 0, function () {
+          var i = state.subs.indexOf(s);
+          if (i >= 0) state.subs.splice(i, 1); else state.subs.push(s);
+          saveState();
+          render();
+        }));
+      });
+      clearChips(overlayRow);
+      OVERLAYS.forEach(function (o) {
+        overlayRow.appendChild(chipEl(o === "git" ? "\u2325 git" : (o === "thinking" ? "\ud83e\udde0 thinking" : "\ud83e\udde9 plugins"), state.overlays.indexOf(o) >= 0, function () {
+          var i = state.overlays.indexOf(o);
+          if (i >= 0) state.overlays.splice(i, 1); else state.overlays.push(o);
+          saveState();
+          render();
+          renderPip();
+        }));
+      });
+      var out = document.getElementById("promptOut");
+      if (out) out.textContent = buildPrompt();
+      renderBuilder();
+    }
+
+    var promptOutEl = document.getElementById("promptOut");
+    if (promptOutEl) promptOutEl.addEventListener("click", function () {
+      if (!String(window.getSelection() || "").length) selectPromptText();
+    });
+
+    var copyPromptBtn = document.getElementById("copyPromptBtn");
+    if (copyPromptBtn) copyPromptBtn.addEventListener("click", function () {
+      var text = buildPrompt();
+      copyText(text, "Copied \u2014 paste it into a new AI Helper session.");
+      logThought("Activation prompt copied: mode " + modeName() + ", overlays " + (chosenOverlays().join(", ") || "none") + ".");
+    });
+    var copyImportsBtn = document.getElementById("copyImportsBtn");
+    if (copyImportsBtn) copyImportsBtn.addEventListener("click", function () {
+      copyText(buildImports(), "Copied \u2014 the import lines for main.pjs.");
+    });
+
+    // ── Live master status: proves the text is not a frozen copy ──────────────
+    (function masterStatus() {
+      var el = document.getElementById("masterStatus");
+      if (!el) return;
+      function say(html) { el.innerHTML = html; }
+      var R = null;
+      try { R = window.root || root; } catch (e) { R = window.root; }
+      if (!R || typeof R.blueprintMaster !== "function") {
+        say("master: resolver unavailable here \u2014 see main.pjs (blueprintMaster / blueprintSources).");
+        return;
+      }
+      R.blueprintMaster().then(function (m) {
+        if (!m || !m.ok) { say("master: could not resolve the live version."); return; }
+        var when = m.savedAt ? new Date(m.savedAt).toLocaleDateString() : "unknown";
+        say("master <b>" + (m.version || "version unknown") + "</b> \u00b7 " + m.bytes.toLocaleString() +
+          " chars \u00b7 last edit " + when + " \u00b7 pulled live just now from its current key");
+      }, function () { say("master: could not resolve the live version."); });
+    })();
+
+    // ── Editor-only picture-in-picture: the plugin catalog / inspector ───────
+    var pip = { forceHide: false, el: null, body: null, frame: null, bubble: null, built: false };
+    var PIP_WANT = "plugins";
+    var PIP_POS = "blueprint-pip-pos:plugins";
+    var PIP_BIG = "blueprint-pip-big:plugins";
+    var PIP_ENTRY = "https://null.perchance.org/i-am-canceled-presents-all-of-the-plugins";
+    var PIP_PAGE = "https://perchance.org/i-am-canceled-presents-all-of-the-plugins";
+
+    function isEditorView() {
+      if (pip.forceHide) return false;
+      try { if (window.__aiThink && typeof window.__aiThink.isEditor === "function") return window.__aiThink.isEditor(); } catch (e) {}
+      try { if (window.generatorIsInEditMode === true) return true; } catch (e) {}
+      try { if (window.generatorIsUnsaved === true) return true; } catch (e) {}
+      try { if (String(location.hash).toLowerCase().indexOf("edit") >= 0) return true; } catch (e) {}
+      try { if (String(location.search).indexOf("pip=1") >= 0) return true; } catch (e) {}
+      return false;
+    }
+
+    function pipWanted() { return state.overlays.indexOf(PIP_WANT) >= 0; }
+
+    function pipMove(ev) {
+      try { if (ev.button !== undefined && ev.button !== 0) return; } catch (e) {}
+      var el = pip.el;
+      if (!el) return;
+      try { ev.preventDefault(); } catch (e) {}
+      var r = el.getBoundingClientRect();
+      var sx = ev.clientX - r.left;
+      var sy = ev.clientY - r.top;
+      function move(e) {
+        var x = Math.max(-r.width + 120, Math.min(window.innerWidth - 120, e.clientX - sx));
+        var y = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - sy));
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+        el.style.bottom = "auto";
+      }
+      function up() {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        try { localStorage.setItem(PIP_POS, JSON.stringify({ left: el.style.left, top: el.style.top })); } catch (e) {}
+      }
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    }
+
+    function pipSetOpen(open) {
+      if (!pip.el) return;
+      pip.el.classList.toggle("open", open);
+      pip.el.style.display = open ? "block" : "none";
+      if (pip.bubble) pip.bubble.style.display = (!open && isEditorView() && pipWanted()) ? "block" : "none";
+      if (open && pip.frame && !pip.frame.src) pip.frame.src = PIP_ENTRY;
+      try { localStorage.setItem("blueprint-pip-closed:plugins", open ? "0" : "1"); } catch (e) {}
+    }
+
+    function buildPip() {
+      if (pip.built || !pipWanted()) return;
+      pip.built = true;
+      var el = document.createElement("div");
+      el.className = "bp-pip open";
+      el.setAttribute("data-bp-pip", PIP_WANT);
+      var pos = null;
+      try { pos = JSON.parse(localStorage.getItem(PIP_POS) || "null"); } catch (e) { pos = null; }
+      if (pos && pos.left) { el.style.left = pos.left; el.style.top = pos.top; el.style.bottom = "auto"; }
+      try { if (localStorage.getItem(PIP_BIG) === "1") el.classList.add("big"); } catch (e) {}
+
+      var head = document.createElement("div");
+      head.className = "bp-pip-head";
+      head.addEventListener("pointerdown", pipMove);
+
+      var title = document.createElement("span");
+      title.className = "bp-pip-title";
+      title.textContent = "\ud83e\udde9 plugin catalog";
+      var sub = document.createElement("span");
+      sub.className = "bp-pip-sub";
+      sub.textContent = "editor only \u00b7 pick plugins \u2192 copy import lines";
+
+      var btns = document.createElement("span");
+      btns.className = "bp-pip-btns";
+      function headBtn(label, titleText, onClick) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "bp-pip-btn";
+        b.textContent = label;
+        b.title = titleText;
+        b.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+        b.addEventListener("click", function (e) { e.stopPropagation(); onClick(); });
+        return b;
+      }
+      var openLink = document.createElement("a");
+      openLink.className = "bp-pip-btn";
+      openLink.href = PIP_PAGE;
+      openLink.target = "_blank";
+      openLink.rel = "noopener noreferrer";
+      openLink.textContent = "open \u2197";
+      openLink.title = "Open the inspector full-page";
+      openLink.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+
+      btns.appendChild(openLink);
+      btns.appendChild(headBtn("\u2922", "Maximize / restore", function () {
+        el.classList.toggle("big");
+        try { localStorage.setItem(PIP_BIG, el.classList.contains("big") ? "1" : "0"); } catch (e) {}
+      }));
+      btns.appendChild(headBtn("\u2014", "Collapse", function () { pipSetOpen(!el.classList.contains("open")); }));
+      btns.appendChild(headBtn("\u2715", "Close (reopen from the pill)", function () {
+        pipSetOpen(false);
+        try { localStorage.setItem("blueprint-pip-closed:plugins", "1"); } catch (e) {}
+      }));
+
+      head.appendChild(title);
+      head.appendChild(sub);
+      head.appendChild(btns);
+
+      var body = document.createElement("div");
+      body.className = "bp-pip-body";
+      var frame = document.createElement("iframe");
+      frame.className = "bp-pip-frame";
+      frame.title = "Perchance Plugin Inspector";
+      frame.setAttribute("loading", "lazy");
+      frame.setAttribute("allow", "clipboard-write");
+      // src is set on first open (pipSetOpen) so a collapsed clip costs nothing.
+      var note = document.createElement("div");
+      note.className = "bp-pip-note";
+      note.innerHTML = "Search the catalog, read a plugin's source, tick the ones you want, then <b>\u29c9 import lines</b> in the inspector copies them as <code>" + imp(["name", "name"]) + "</code> \u2014 paste that into main.pjs. This window only exists while editing; a published page never loads it.";
+      body.appendChild(frame);
+      body.appendChild(note);
+
+      el.appendChild(head);
+      el.appendChild(body);
+      document.body.appendChild(el);
+      pip.el = el;
+      pip.body = body;
+      pip.frame = frame;
+
+      var bubble = document.createElement("button");
+      bubble.type = "button";
+      bubble.className = "bp-pip-bubble";
+      bubble.textContent = "\ud83e\udde9 plugins";
+      bubble.style.display = "none";
+      bubble.addEventListener("click", function () { pipSetOpen(true); });
+      document.body.appendChild(bubble);
+      pip.bubble = bubble;
+
+      var wasClosed = true;
+      try { wasClosed = localStorage.getItem("blueprint-pip-closed:plugins") !== "0"; } catch (e) {}
+      // First visit: stay collapsed to the pill so the page is readable; the
+      // user opens it (and its state is then remembered).
+      if (wasClosed) { pip.el.classList.remove("open"); pip.el.style.display = "none"; }
+      pipSetOpen(!wasClosed);
+    }
+
+    function renderPip() {
+      if (!pipWanted()) {
+        if (pip.el) pip.el.style.display = "none";
+        if (pip.bubble) pip.bubble.style.display = "none";
+        return;
+      }
+      if (!isEditorView()) {
+        if (pip.el) pip.el.style.display = "none";
+        if (pip.bubble) pip.bubble.style.display = "none";
+        return;
+      }
+      buildPip();
+      if (!pip.el) return;
+      var isOpen = pip.el.classList.contains("open");
+      pip.el.style.display = isOpen ? "block" : "none";
+      if (pip.bubble) pip.bubble.style.display = isOpen ? "none" : "block";
+    }
+
+    window.__bpPip = {
+      isEditorView: isEditorView,
+      previewPublished: function (v) { pip.forceHide = !!v; renderBuilder(); renderPip(); },
+      show: function () { pip.forceHide = false; pipSetOpen(true); renderBuilder(); renderPip(); },
+      element: function () { return pip.el; }
+    };
+
+    render();
+    renderBuilder();
+    renderPip();
+  })();
+</script>
