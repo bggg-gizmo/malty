@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="184" height="30" viewBox="0 0 184 30" role="img" aria-label="LICENSE: APACHE 2.0">
+<title>LICENSE: APACHE 2.0</title>
+<rect width="184" height="30" rx="6" fill="#080c0b"/>
+<path d="M85 0H178Q184 0 184 6V24Q184 30 178 30H85Z" fill="#30df67"/>
+<rect x="0.5" y="0.5" width="183" height="29" rx="5.5" fill="none" stroke="#2d5b41"/>
+<g font-family="DejaVu Sans,Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="central"><text x="42.5" y="15.5" fill="#d8ffe0">LICENSE</text><text x="134.5" y="15.5" fill="#03130c">APACHE 2.0</text></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="207" height="30" viewBox="0 0 207 30" role="img" aria-label="BUILDS: LOCAL · NO CI">
+<title>BUILDS: LOCAL · NO CI</title>
+<rect width="207" height="30" rx="6" fill="#080c0b"/>
+<path d="M85 0H201Q207 0 207 6V24Q207 30 201 30H85Z" fill="#30df67"/>
+<rect x="0.5" y="0.5" width="206" height="29" rx="5.5" fill="none" stroke="#2d5b41"/>
+<g font-family="DejaVu Sans,Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="central"><text x="42.5" y="15.5" fill="#d8ffe0">BUILDS</text><text x="146.0" y="15.5" fill="#03130c">LOCAL · NO CI</text></g>
+</svg>
