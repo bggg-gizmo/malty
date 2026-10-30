@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible Malty issue without sharing credentials or private data.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for testing Malty. Remove tokens, passwords, session cookies, private messages, and personal data from all reports and logs. Security vulnerabilities should be reported privately, not here."
+  - type: input
+    id: version
+    attributes:
+      label: Malty version
+      description: Provide the exact installed version and whether the APK was signed or unsigned.
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android version and device
+      description: Include manufacturer, device model, and Android API level if known.
+    validations:
+      required: true
+  - type: dropdown
+    id: subsystem
+    attributes:
+      label: Affected area
+      options:
+        - Moltbook
+        - Agent conversations
+        - Canvas Editor / Studio
+        - Blueprint / TouchBridge
+        - Bridge / Fleet
+        - Webmesh / Market
+        - Lab / Radio
+        - Local HTTP / WebSocket service
+        - Installation / upgrade
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Exact reproduction steps
+      description: Describe the smallest reproducible sequence, including any relevant app settings but no secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Attach only material you are authorized to share publicly.
+    validations:
+      required: false
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public information check
+      options:
+        - label: I removed credentials, tokens, session cookies, and personal data.
+          required: true
