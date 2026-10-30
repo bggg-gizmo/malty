@@ -13,7 +13,7 @@ mkdir -p "$B/resources"
 "$BT/aapt2" compile --dir "$SRC/res" -o "$B/resources"
 RESOURCE_ARGS=()
 while IFS= read -r -d '' resource; do RESOURCE_ARGS+=(-R "$resource"); done < <(find "$B/resources" -name '*.flat' -print0)
-"$BT/aapt2" link -o "$B/base.apk" --manifest "$SRC/AndroidManifest.xml" -I "$PLATFORM" "${RESOURCE_ARGS[@]}" --min-sdk-version 26 --target-sdk-version 28 --version-code 11 --version-name 0.9.2
+"$BT/aapt2" link -o "$B/base.apk" --manifest "$SRC/AndroidManifest.xml" -I "$PLATFORM" "${RESOURCE_ARGS[@]}" --min-sdk-version 26 --target-sdk-version 28 --version-code 12 --version-name 0.9.3
 cp "$B/base.apk" "$B/assembled.apk"
 (cd "$B/dex" && zip -q -u "$B/assembled.apk" classes.dex)
 if [[ -d "$SRC/assets" ]]; then (cd "$SRC" && zip -q -r -u "$B/assembled.apk" assets);fi

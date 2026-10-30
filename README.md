@@ -44,6 +44,8 @@ SHA-256  a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e
 File    Malty-signed-v0.9.2.apk
 ```
 
+> **v0.9.3 source staging:** [Build and verification guide](app/CanceledAgent-Android-IndependentProject-v0.9.2/docs/BUILD_v0.9.3.md) and [strict offline validation runner](app/CanceledAgent-Android-IndependentProject-v0.9.2/scripts/verify-and-build-v0.9.3.sh) now target v0.9.3 / versionCode 12. **No v0.9.3 signed APK has been published or fully acceptance-tested.** The downloadable v0.9.2 APK is unchanged.
+
 > **2026-10-30 security-source notice:** The signed v0.9.2 APK linked above is the **original unpatched testing binary**. New [source-only hardening](docs/SECURITY_HARDENING_v0.9.2.md) improves backend authorization, Bridge TLS identity, authenticated relay commands, LAN-peer filtering and clipboard handling. Those source changes are **not in the downloadable APK** until a fresh owner-signed Android-tested release is published. Leave LAN hosting and outbound Bridge disabled on untrusted networks in the existing APK.
 
 > **Testing release, not production-certified.** Host regression tests and APK signature verification have passed; physical-device behavior, authenticated live integrations and full original third-party plugin parity still need independent testing. The [GitHub Releases page](https://github.com/bggg-gizmo/malty/releases) does not yet contain a native prerelease entry; use the repository download above.

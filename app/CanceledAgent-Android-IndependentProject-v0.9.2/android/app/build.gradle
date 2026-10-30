@@ -3,11 +3,11 @@ android {
     namespace 'org.canceledagent.app'
     compileSdk 35
     defaultConfig {
-        applicationId 'org.canceledagent.independent'
+        applicationId 'org.canceledagent.app'
         minSdk 26
-        targetSdk 35
-        versionCode 7
-        versionName '0.8.0'
+        targetSdk 28
+        versionCode 12
+        versionName '0.9.3'
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
