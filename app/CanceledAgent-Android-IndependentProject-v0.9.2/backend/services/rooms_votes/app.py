@@ -308,9 +308,10 @@ class Hub:
         return {"ok": False, "err": "unknown-rpc", "method": method}
 
 
-def _loopback_peer(host: str) -> bool:
-    # TestClient uses an in-process ASGI peer named testclient; real sockets report IPs.
-    if host == "testclient":
+def _loopback_peer(host: str, server: tuple | None = None) -> bool:
+    # In-process TestClient identifies both client=testclient and server=testserver.
+    # This is never an exception for a real network listener or forwarded Host header.
+    if host == "testclient" and server and server[0] == "testserver":
         return True
     from ipaddress import ip_address
     try:
@@ -347,7 +348,7 @@ def create_app(db_path: str | None = None) -> FastAPI:
             auth = request.headers.get("authorization", "")
             if not hmac.compare_digest(auth, "Bearer " + token):
                 return JSONResponse({"ok": False, "err": "unauthorized"}, status_code=401)
-        elif not _loopback_peer(request.client.host if request.client else ""):
+        elif not _loopback_peer(request.client.host if request.client else "", request.scope.get("server")):
             return JSONResponse({"ok": False, "err": "backend-token-required-for-network"}, status_code=403)
         return await call_next(request)
     from services.mesh import mount as mount_mesh
@@ -402,7 +403,7 @@ def create_app(db_path: str | None = None) -> FastAPI:
             if not hmac.compare_digest(socket.headers.get("authorization", ""), "Bearer " + token):
                 await socket.close(code=4401)
                 return
-        elif not _loopback_peer(socket.client.host if socket.client else ""):
+        elif not _loopback_peer(socket.client.host if socket.client else "", socket.scope.get("server")):
             await socket.close(code=4403)
             return
         await socket.accept()

@@ -4,7 +4,7 @@ import pytest
 import httpx
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
-from services.rooms_votes.app import create_app
+from services.rooms_votes.app import create_app, _loopback_peer
 
 
 @pytest.fixture
@@ -65,3 +65,11 @@ def test_websocket_rejects_wrong_token(app, monkeypatch):
         assert rejected.value.code == 4401
         with client.websocket_connect("/ws", headers={"Authorization": "Bearer test-only-access-secret"}) as socket:
             assert socket is not None
+
+
+def test_testclient_transport_exception_cannot_be_used_on_a_real_listener():
+    assert _loopback_peer("testclient", ("testserver", 80))
+    assert not _loopback_peer("testclient", ("0.0.0.0", 8765))
+    assert not _loopback_peer("testclient", None)
+    assert _loopback_peer("127.0.0.1", ("0.0.0.0", 8765))
+    assert not _loopback_peer("198.51.100.45", ("0.0.0.0", 8765))
