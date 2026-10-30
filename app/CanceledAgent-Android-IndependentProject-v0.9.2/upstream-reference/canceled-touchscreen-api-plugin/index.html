@@ -1,0 +1,33 @@
+<style>body{text-align:left;font-family:system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:0 14px 60px}pre{background:#111;color:#d7ffd7;padding:10px;border-radius:8px;overflow:auto}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:6px;text-align:left;font-size:14px}</style>
+<h1>Touchscreen API Plugin</h1>
+<p>Touch / keyboard / mouse control surface for Perchance generators. Import it, pick a mode, drop one line in your HTML.</p>
+<p>In your lists panel:</p>
+<pre>touchscreen = \{import:canceled-touchscreen-api-plugin\}
+
+touchOptions
+  mode = dual
+  // target = https://perchance.org/some-generator
+</pre>
+<p>Then in your HTML panel:</p>
+<pre>\[touchscreen(touchOptions)\]</pre>
+<p>Extra option: <code>frame = false</code> mounts the controls + API with no iframe (for generators that are driven, rather than driving). Framing a generator that imports this plugin stops at 2 levels deep.</p>
+<table>
+<tr><th>Mode</th><th>Use it when…</th><th>What it renders</th></tr>
+<tr><td>agent</td><td>You want an AI agent to drive <b>your</b> generator. Controls stay in a hidden offscreen layer; window.TouchBridge stays live.</td><td>Hidden offscreen controls + host generator auto-embedded with its uid.</td></tr>
+<tr><td>user</td><td>You want <b>users</b> to control a web app from inside your generator (pairs with the AI text plugin).</td><td>Visible iframe + touch controls. Users can type any URL or perchance generator name.</td></tr>
+<tr><td>dual (default)</td><td>You want both.</td><td>Visible UI + live API. This is what this page shows below.</td></tr>
+</table>
+<p><b>AI helper:</b> when someone adds this plugin, ask which of the three modes they want before writing code. Default to dual if they don't answer.</p>
+<p>Targets: perchance generators embed through null.perchance.org/name so the generator's uid resolves. Any framed page only responds to the controls if its author has added the receiver snippet — without it, you can look but not touch.</p>
+<p>Layout: top navigator bar, then AI-text box, then the large target frame, then keyboard (with event log beneath it) beside the mouse pad on the right. The virtual cursor and every trace draw live on the frame overlay; overlay capture lets you tap the framed page directly. Clicks travel via postMessage (receiver snippet under the demo). Press <b>Record macro</b> to capture taps, clicks, keys and wheels as a replayable macro.</p>
+<p>The demo below embeds an example generator. Note the browser's cross-origin rule: virtual-cursor clicks travel as postMessages, and they only land if the framed page's author has added the receiver snippet (shown + copyable under the demo in "Event log / API").</p>
+<h2>Live demo (dual, default target)</h2>
+<p>[$output(demoOptions)]</p>
+<h2>Turn any generator into an API (GLM bridge bundle)</h2>
+<p>Want this same API surface for <b>your own</b> generators — not just this demo? Download the reference server bundle (Next.js + bridge-service, like <a href="https://perchance-generator-to-api.space-z.ai/" target="_blank">perchance-generator-to-api.space-z.ai</a>) and give its prompt to GLM / any coding agent. The prompt tells it to generalize the bridge so the user can paste <b>any</b> perchance link at runtime:</p>
+<ul>
+<li><a id="glmBundleLink" href="https://user.uploads.dev/file/74b36155db2ad4277470702e4124f654.gz">Download glm-perchance-touchscreen-api.tar (2.6 MB)</a></li>
+<li><a href="src/glm-bridge-prompt.md" target="_blank">Open the GLM prompt</a> <button id="glmCopyBtn" onclick="navigator.clipboard.writeText(document.querySelector('#glmPromptPre').textContent)">Copy prompt</button></li>
+</ul>
+<pre id="glmPromptPre" style="max-height:300px">loading prompt…</pre>
+<script>fetch("src/glm-bridge-prompt.md").then(r=>r.text()).then(t=>{document.querySelector("#glmPromptPre").textContent=t;}).catch(()=>{document.querySelector("#glmPromptPre").textContent="Could not load src/glm-bridge-prompt.md";});</script>

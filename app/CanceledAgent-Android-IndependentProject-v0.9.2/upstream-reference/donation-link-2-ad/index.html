@@ -1,0 +1,202 @@
+<style>
+  .dp-body { margin:0; background: radial-gradient(1200px 500px at 15% -10%, rgba(153,69,255,.16), transparent 60%), radial-gradient(1000px 460px at 100% 0%, rgba(20,241,149,.12), transparent 55%), #0b0c12; color:#e8eaf1; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; min-height:100vh; }
+  .dp-wrap { max-width: 880px; margin: 0 auto; padding: 34px 20px 60px; text-align:left; }
+  .dp-badge { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#c4b5fd; background:rgba(139,92,246,.14); border:1px solid rgba(139,92,246,.3); padding:5px 12px; border-radius:999px; }
+  .dp-hero { margin: 18px 0 6px; }
+  .dp-hero h1 { margin:0; font-size:clamp(28px,5vw,42px); line-height:1.1; letter-spacing:-.02em; }
+  .dp-hero h1 .acc { background:linear-gradient(90deg,#a78bfa,#34d399); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .dp-hero p.lede { margin:12px 0 0; color:#a5adc0; font-size:16px; max-width:60ch; line-height:1.55; }
+  .dp-hero p.lede b { color:#e8eaf1; font-weight:600; }
+  .dp-section { margin-top: 40px; }
+  .dp-section h2 { margin:0 0 14px; font-size:20px; letter-spacing:-.01em; }
+  .dp-section h2 .n { color:#64748b; font-weight:800; margin-right:9px; font-size:15px; }
+  .dp-demo { background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.09); border-radius:18px; padding:18px; }
+  .dp-demo + .dp-demo { margin-top:12px; }
+  .dp-demo-cap { font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#7e8699; margin:0 0 9px; }
+  .dp-demo-cap code { text-transform:none; background:rgba(139,92,246,.15); color:#c4b5fd; padding:1px 6px; border-radius:6px; font-size:11px; }
+  .dp-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:700px){ .dp-grid2 { grid-template-columns:1fr; } }
+  .dp-card { background:#10131c; border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:18px; }
+  .dp-steps { list-style:none; margin:0; padding:0; counter-reset:s; }
+  .dp-steps li { counter-increment:s; position:relative; padding:0 0 18px 42px; }
+  .dp-steps li::before { content:counter(s); position:absolute; left:0; top:0; width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,#8b5cf6,#34d399); color:#0b0c12; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .dp-steps li:last-child { padding-bottom:0; }
+  .dp-steps p { margin:0 0 8px; color:#c3c9d8; line-height:1.5; }
+  .dp-steps code { background:#1a1e2b; border:1px solid rgba(255,255,255,.07); color:#7ee7b8; padding:1.5px 6px; border-radius:6px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; }
+  pre.dp-code { background:#0a0d14; border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:13px 16px; margin:8px 0 0; overflow-x:auto; }
+  pre.dp-code code { color:#a5f3d0; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; line-height:1.6; white-space:pre; }
+  table.dp-opt { width:100%; border-collapse:collapse; font-size:13.5px; }
+  table.dp-opt th, table.dp-opt td { text-align:left; padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.07); vertical-align:top; }
+  table.dp-opt th { color:#8b93a7; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+  table.dp-opt td code { background:#1a1e2b; border:1px solid rgba(255,255,255,.07); color:#7ee7b8; padding:1px 5px; border-radius:5px; font-size:12px; font-family:ui-monospace,Menlo,Consolas,monospace; }
+  table.dp-opt td { color:#c3c9d8; }
+  table.dp-opt td:first-child { white-space:nowrap; color:#e8eaf1; font-weight:600; }
+  @media (max-width:700px){ table.dp-opt td:first-child { white-space:normal; } table.dp-opt td { overflow-wrap:anywhere; } pre.dp-code code { white-space:pre-wrap; word-break:break-all; } }
+  .dp-qrgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
+  @media (max-width:700px){ .dp-qrgrid { grid-template-columns:1fr; } }
+  .dp-qr { background:#fff; border-radius:14px; padding:16px; text-align:center; color:#111; }
+  .dp-qr img { width:100%; max-width:210px; border-radius:8px; display:block; margin:0 auto; }
+  .dp-qr .brand { font-weight:800; font-size:15px; margin:12px 0 2px; }
+  .dp-qr .hint { font-size:12.5px; color:#5b6472; }
+  .dp-qr a.go { display:inline-block; margin-top:10px; font-size:13px; font-weight:700; text-decoration:none; border-radius:999px; padding:7px 16px; }
+  .dp-qr a.go.pp { background:#ffc439; color:#003087; }
+  .dp-qr a.go.ca { background:#00d632; color:#000; }
+  .dp-qr a.go.sol { background:#0b0c12; color:#34d399; }
+  .dp-qr a.go.et { background:#627eea; color:#fff; }
+  .dp-soladdr { display:flex; align-items:center; gap:8px; margin-top:10px; justify-content:center; flex-wrap:wrap; }
+  .dp-soladdr code { font-size:11.5px; background:#f1f5f9; padding:5px 8px; border-radius:7px; word-break:break-all; max-width:100%; }
+  .dp-soladdr button { background:#0b0c12; color:#34d399; border:1px solid rgba(20,241,149,.4); font-weight:700; font-size:12px; border-radius:999px; padding:6px 13px; cursor:pointer; }
+  .dp-soladdr button.ok { background:#06301f; }
+  .dp-foot { margin-top:46px; color:#6b7280; font-size:13px; text-align:center; line-height:1.6; }
+  .dp-note { font-size:13px; color:#98a1b5; margin-top:10px; line-height:1.5; }
+  .dp-note code { background:#1a1e2b; border:1px solid rgba(255,255,255,.07); color:#7ee7b8; padding:1px 5px; border-radius:5px; font-size:12px; }
+</style>
+
+<div class="dp-body">
+  <div class="dp-wrap">
+
+    <span class="dp-badge">Perchance plugin · banner ad</span>
+    <div class="dp-hero">
+      <h1>Donation<span class="acc">Link2Ad</span></h1>
+      <p class="lede">A one-line, drop-in donation <b>banner ad</b> for any Perchance generator. Four payment chips — <b>PayPal</b>, <b>Cash App</b>, <b>Solana (SOL)</b> and <b>Ethereum (ETH)</b> — with one-click wallet-address copy. Import it, drop it in, collect tips.</p>
+    </div>
+
+    <div class="dp-section">
+      <h2><span class="n">01</span>Live demo</h2>
+      <div class="dp-demo">
+        <p class="dp-demo-cap">Default theme — no options</p>
+        [root.donationBanner()]
+      </div>
+      <div style="margin-top:12px">
+        <div class="dp-demo">
+          <p class="dp-demo-cap">Compact · dark</p>
+          [root.donationBanner({ compact: true, dark: "dark" })]
+        </div>
+        <div class="dp-demo">
+          <p class="dp-demo-cap">Compact · light</p>
+          [root.donationBanner({ compact: true, dark: "light" })]
+        </div>
+      </div>
+      <p class="dp-note">The banner stretches to whatever container you place it in — great as a leaderboard strip under a title, above a footer, or inside a card. On narrow screens the chips stack full-width.</p>
+    </div>
+
+    <div class="dp-section">
+      <h2><span class="n">02</span>Add it to your generator</h2>
+      <div class="dp-card">
+        <ol class="dp-steps">
+          <li>
+            <p>In your generator's <code>main.pjs</code>, import the plugin (the name on the left is up to you):</p>
+            <pre class="dp-code"><code id="codeImport"></code></pre>
+          </li>
+          <li>
+            <p>Drop the banner anywhere in your <code>index.html</code> where you want the ad to appear:</p>
+            <pre class="dp-code"><code id="codePlace"></code></pre>
+          </li>
+          <li>
+            <p>Done. Visitors can tap <b>PayPal</b> or <b>Cash App</b> to donate, or tap the <b>SOL</b> or <b>ETH</b> chip to copy a wallet address to their clipboard (a small <span style="color:#7ee7b8">↗</span> links to Solscan / Etherscan).</p>
+          </li>
+        </ol>
+        <p class="dp-note">To point the banner at different accounts without editing this plugin, pass options per call, e.g.<br>
+        <code id="codeCustom"></code></p>
+      </div>
+    </div>
+
+    <div class="dp-section">
+      <h2><span class="n">03</span>Options</h2>
+      <div class="dp-card">
+        <table class="dp-opt">
+          <tr><th>Option</th><th>Type</th><th>Default</th><th>What it does</th></tr>
+          <tr><td>name</td><td>string</td><td>I am canceled</td><td>Name shown in the banner heading</td></tr>
+          <tr><td>tagline</td><td>string</td><td>Liked it? …</td><td>Small supporting line under the name</td></tr>
+          <tr><td>dark</td><td>auto / light / dark</td><td>auto</td><td>Banner theme (auto follows the visitor's OS)</td></tr>
+          <tr><td>compact</td><td>boolean</td><td>false</td><td>Tighter single-line layout, hides tagline</td></tr>
+          <tr><td>showExplorer</td><td>boolean</td><td>true</td><td>Show Solscan / Etherscan links beside the SOL &amp; ETH chips</td></tr>
+          <tr><td>chips</td><td>object</td><td>all on</td><td>flags <code>chips.paypal</code>, <code>chips.cashApp</code>, <code>chips.solana</code>, <code>chips.eth</code> to hide a chip</td></tr>
+          <tr><td>paypal.label / url</td><td>string</td><td>—</td><td>PayPal button label and destination URL</td></tr>
+          <tr><td>cashApp.label / tag / url</td><td>string</td><td>—</td><td>Cash App button label, cashtag and URL</td></tr>
+          <tr><td>solana.label / address</td><td>string</td><td>—</td><td>SOL chip label and the wallet address to copy</td></tr>
+          <tr><td>solana.explorerUrl</td><td>string</td><td>Solscan</td><td>Block explorer link for the wallet</td></tr>
+          <tr><td>solana.copyLabel</td><td>string</td><td>Copy SOL address</td><td>SOL chip text before it is copied</td></tr>
+          <tr><td>eth.label / address</td><td>string</td><td>—</td><td>ETH chip label and the EVM wallet address to copy</td></tr>
+          <tr><td>eth.explorerUrl</td><td>string</td><td>Etherscan</td><td>Block explorer link for the wallet</td></tr>
+          <tr><td>eth.copyLabel</td><td>string</td><td>Copy ETH address</td><td>ETH chip text before it is copied</td></tr>
+        </table>
+        <p class="dp-note">Defaults in the plugin's <code>main.pjs</code> are pre-filled with this page's donation targets, so zero configuration is needed — just import and place.</p>
+      </div>
+    </div>
+
+    <div class="dp-section">
+      <h2><span class="n">04</span>Scan to donate</h2>
+      <p class="dp-note" style="margin-top:0">The same four targets as scannable QR codes — handy on a phone, or for print/social placement.</p>
+      <div class="dp-qrgrid">
+        <div class="dp-qr">
+          <img src="https://user.uploads.dev/file/c8279845f791766028b7dabd76b36b3e.png" alt="PayPal QR code">
+          <div class="brand">PayPal</div>
+          <div class="hint">Frank Cox</div>
+          <a class="go pp" href="https://www.paypal.com/qrcodes/p2pqrc/WGMNG3RKN97BL" target="_blank" rel="noopener">Open PayPal</a>
+        </div>
+        <div class="dp-qr">
+          <img src="https://user.uploads.dev/file/e92b1d247cbd67671e664506d9b3f9ef.jpg" alt="Cash App QR code">
+          <div class="brand">Cash App</div>
+          <div class="hint">$falcox904</div>
+          <a class="go ca" href="https://cash.app/$falcox904" target="_blank" rel="noopener">Open Cash App</a>
+        </div>
+        <div class="dp-qr">
+          <img src="https://user.uploads.dev/file/8ced29e758f75e4bb573c8d3c8ecddd9.png" alt="Solana QR code">
+          <div class="brand">Solana</div>
+          <div class="hint">Solana Pay · any SOL wallet</div>
+          <a class="go sol" href="https://solscan.io/account/4guatesjezaC5h2niYR6ZDmZ6pQagQAAvtnwBf7NMNpK" target="_blank" rel="noopener">View on Solscan</a>
+          <div class="dp-soladdr">
+            <code id="solAddrCode">4guatesjezaC5h2niYR6ZDmZ6pQagQAAvtnwBf7NMNpK</code>
+            <button id="solCopyBtn" type="button">Copy</button>
+          </div>
+        </div>
+        <div class="dp-qr">
+          <img src="https://user.uploads.dev/file/78297e3e821efd65bf97f90da8d7f250.png" alt="Ethereum QR code">
+          <div class="brand">Ethereum</div>
+          <div class="hint">EVM wallet · any ETH wallet</div>
+          <a class="go et" href="https://etherscan.io/address/0xFBdB59298ea0B9D867897CCEDDb0De1e2B03909c" target="_blank" rel="noopener">View on Etherscan</a>
+          <div class="dp-soladdr">
+            <code id="ethAddrCode">0xFBdB59298ea0B9D867897CCEDDb0De1e2B03909c</code>
+            <button id="ethCopyBtn" type="button">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dp-foot">
+      DonationLink2Ad · Perchance importable banner plugin<br>
+      SOL · ETH · PayPal · Cash App — scan, tap or copy to show support.
+    </div>
+  </div>
+</div>
+
+<script>
+  codeImport.textContent = "donationBanner = " + "{i" + "mport:donation-link-2-ad}";
+  codePlace.textContent = "[root.donationBanner()]";
+  codeCustom.textContent = "[root.donationBanner({ name: 'Your Name', paypal: { url: 'https://paypal.me/you' }, eth: { address: '0xYourEthereumAddress' } })]";
+  solCopyBtn.addEventListener("click", () => {
+    const done = () => {
+      solCopyBtn.textContent = "Copied!";
+      solCopyBtn.classList.add("ok");
+      setTimeout(() => { solCopyBtn.textContent = "Copy"; solCopyBtn.classList.remove("ok"); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(solAddrCode.textContent).then(done).catch(() => { window.prompt("Solana address:", solAddrCode.textContent); });
+    } else {
+      window.prompt("Solana address:", solAddrCode.textContent);
+    }
+  });
+  ethCopyBtn.addEventListener("click", () => {
+    const done = () => {
+      ethCopyBtn.textContent = "Copied!";
+      ethCopyBtn.classList.add("ok");
+      setTimeout(() => { ethCopyBtn.textContent = "Copy"; ethCopyBtn.classList.remove("ok"); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ethAddrCode.textContent).then(done).catch(() => { window.prompt("Ethereum address:", ethAddrCode.textContent); });
+    } else {
+      window.prompt("Ethereum address:", ethAddrCode.textContent);
+    }
+  });
+</script>

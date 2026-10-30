@@ -1,0 +1,481 @@
+// AI HELPER NOTE: when the user adds this plugin with `touchscreen = {import:canceled-touchscreen-api-plugin}`, ASK which setup mode they want before writing code:
+//   1) "agent" - hidden offscreen control surface so an AI agent can drive THIS generator (TouchBridge API + hidden iframe of the host generator, controls kept offscreen).
+//   2) "user" - visible cross-origin iframe inside the generator so USERS can load a URL or perchance generator of choice (embedded with its uid, or srcdoc rebuild via the Can't-display button).
+//   3) "dual" (DEFAULT) - both at once. If the user doesn't answer, use dual.
+// Usage in lists panel:
+//   touchOptions
+//     mode = dual
+//     target = https://perchance.org/some-generator
+// Usage in HTML panel: [touchscreen(touchOptions)]
+// Options: mode = agent|user|dual, target = URL or generator name, frame = false for frameless API-only instances.
+// If the framed generator ALSO imports this plugin with an auto target, framing stops at 2 levels deep (nesting guard).
+// Recommended config inside a generator you want to DRIVE (e.g. Macrohard Doors): mode = agent + frame = false, plus the receiver snippet in its HTML so incoming clicks land.
+// target can be a full URL or a perchance generator name. This plugin never injects headers or runs cross-site scripting (impossible from client JS); blocked pages fall back to an honest srcdoc rebuild.
+
+generateText = {import:ai-text-plugin}
+
+$meta
+  title = Touchscreen API Plugin
+  description = Touch/keyboard/mouse control surface that can drive the host generator (agent mode), embed a URL or perchance generator (user mode), or both (dual, default). Cursor tracing shows on the frame overlay, clicks dispatch for real into same-origin clones and via postMessage otherwise, and iframe interaction can be recorded as replayable macros.
+  tags = plugin, touchscreen, touch, mouse, keyboard, iframe, agent, ai-text, macro
+
+demoOptions
+  mode = dual
+  demo = true
+  frame = true
+  target = https://perchance.org/i-am-canceled-presents-macrohard-doors-os
+
+$output(opts) =>
+  let mode = "dual", target = null, isDemo = false;
+  function optVal(v) {
+    if (v === undefined || v === null) return undefined;
+    if (typeof v === "string" || typeof v === "number") return String(v);
+    if (typeof v === "boolean") return v ? "true" : "false";
+    try { if (v.evaluateItem !== undefined) return String(v.evaluateItem); } catch (e) {}
+    return v;
+  }
+  function opt(name, fb) { let v = opts ? optVal(opts[name]) : undefined; return (v === undefined || v === null || v === "") ? fb : v; }
+  if (typeof opts === "string") target = opts;
+  else if (opts) { mode = opt("mode", "dual"); target = opt("target", opt("url", opt("generator", null))); isDemo = (opt("demo", null) === "true"); }
+  let noFrame = (opt("frame", "true") === "false");
+  let depth = 0;
+  try { let dm = String(window.location.hash).match(/tbdepth(\d+)/); if (dm) depth = parseInt(dm[1], 10) || 0; } catch (eD) {}
+  if (depth >= 2) noFrame = true;
+  if (["agent", "user", "dual"].indexOf(mode) < 0) mode = "dual";
+  let gName = "canceled-touchscreen-api-plugin", gPid = null, unsaved = false;
+  try { gName = window.generatorName || gName; } catch (e) {}
+  try { gPid = window.generatorPublicId || null; } catch (e2) {}
+  try { unsaved = !!window.generatorIsUnsaved; } catch (e3) {}
+  let isPluginPage = (gName === "canceled-touchscreen-api-plugin");
+  try { if (String(window.location.hash).indexOf("tbembed") >= 0 && isDemo) return "<div style=\"font:12px monospace;opacity:.6;\">TouchBridge demo suppressed inside embedded frame (prevents infinite nesting).</div>"; } catch (e4) {}
+  if (!target) {
+    if (isDemo) {
+      if (unsaved && gPid) target = "https://" + gPid + ".perchance.org/" + gName + "#tbembed";
+      else if (unsaved) target = "https://null.perchance.org/" + gName + "#tbembed";
+      else target = "https://perchance.org/i-am-canceled-presents-macrohard-doors-os";
+    } else if (isPluginPage) target = "https://perchance.org/i-am-canceled-presents-macrohard-doors-os";
+    else target = "https://null.perchance.org/" + gName + "#tbdepth" + (depth + 1);
+  }
+  function toEmbedUrl(t) {
+    t = String(t).trim();
+    let h = "";
+    let hi = t.indexOf("#");
+    if (hi >= 0) { h = t.slice(hi); t = t.slice(0, hi); }
+    let sub = t.match(/https?:\/\/[a-z0-9]+\.perchance\.org\/([a-z0-9\-]+)/i);
+    if (sub) return { embed: t + h, genName: sub[1].toLowerCase(), isGen: true };
+    let m = t.match(/perchance\.org\/([a-z0-9\-]+)/i);
+    if (m) return { embed: "https://null.perchance.org/" + m[1].toLowerCase() + h, genName: m[1].toLowerCase(), isGen: true };
+    if (/^[a-z0-9\-]+$/i.test(t) && t.indexOf(".") < 0 && t.indexOf("/") < 0) return { embed: "https://null.perchance.org/" + t.toLowerCase() + h, genName: t.toLowerCase(), isGen: true };
+    return { embed: t + h, genName: null, isGen: false };
+  }
+  let info = toEmbedUrl(target);
+  let uid = "tb" + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  let hidden = (mode === "agent");
+  let html = "<div data-touchbridge-root=\"" + uid + "\" style=\"" + (hidden ? "position:fixed;left:-12000px;top:0;width:1100px;" : "width:100%;") + "\">touch controls loading…</div>";
+  let boot = function () {
+    if (window.__touchBridges && window.__touchBridges[uid] && window.__touchBridges[uid].mounted) return;
+    let mount = document.querySelector("[data-touchbridge-root=\"" + uid + "\"]");
+    if (!mount) { setTimeout(boot, 300); return; }
+    if (!window.__touchBridges) window.__touchBridges = {};
+    let S = { mode: mode, embed: info.embed, genName: info.genName, isGen: info.isGen, log: [], mouse: { x: 50, y: 50 }, held: { left: false, middle: false, right: false }, shift: false, ctrl: false, alt: false, msgCount: 0, macro: [], recording: false };
+    window.__touchBridges[uid] = S;
+    mount.innerHTML = "";
+    mount.style.cssText = hidden ? "position:fixed;left:-12000px;top:0;width:1100px;background:#111;color:#eee;font-family:system-ui,sans-serif;" : "background:#111;color:#eee;font-family:system-ui,sans-serif;border:1px solid #333;border-radius:10px;overflow:hidden;";
+    function mkBtn(label) { let b = document.createElement("button"); b.textContent = label; b.style.cssText = "background:#2a2a35;color:#fff;border:1px solid #555;border-radius:8px;padding:7px 10px;font-size:13px;touch-action:manipulation;"; return b; }
+    function log(t, o) { let e = { t: t, m: Date.now() }; if (o) for (let k in o) e[k] = o[k]; S.log.push(e); if (S.log.length > 300) S.log.shift(); if (logEl) { logEl.textContent = S.log.slice(-60).map(function (x) { return x.t + " " + JSON.stringify(x).slice(0, 150); }).join("\n"); logEl.scrollTop = logEl.scrollHeight; } }
+    function record(a) { if (S.recording) { S.macro.push(a); recInfo.textContent = "REC " + S.macro.length; } }
+    function fwd(m) { try { fr.contentWindow.postMessage(Object.assign({ __touchBridge: 1 }, m), "*"); } catch (e) {} }
+    function sameDoc() { try { let d = fr.contentDocument; if (d) return d; } catch (e) {} return null; }
+    function framePoint(xPct, yPct) { let r = fr.getBoundingClientRect(); return { cx: r.width * xPct / 100, cy: r.height * yPct / 100 }; }
+    function realClick(xPct, yPct, button, count) {
+      let d = sameDoc();
+      if (!d) { fwd({ kind: "click", x: xPct, y: yPct, button: button || "left", count: count || 1 }); return "msg"; }
+      try {
+        let p = framePoint(xPct, yPct);
+        let el = d.elementFromPoint(p.cx, p.cy) || d.body;
+        let btn = button === "middle" ? 1 : button === "right" ? 2 : 0;
+        let init = { button: btn, bubbles: true, cancelable: true, clientX: p.cx, clientY: p.cy };
+        let n = Math.max(1, Math.min(3, count || 1));
+        for (let i = 0; i < n; i++) {
+          el.dispatchEvent(new PointerEvent("pointerdown", init));
+          el.dispatchEvent(new MouseEvent("mousedown", init));
+          el.dispatchEvent(new PointerEvent("pointerup", init));
+          el.dispatchEvent(new MouseEvent("mouseup", init));
+          el.dispatchEvent(new MouseEvent("click", init));
+          if (i > 0) el.dispatchEvent(new MouseEvent("dblclick", init));
+        }
+        if (el.focus && el.focus.apply) { try { el.focus(); } catch (e2) {} }
+        if (button === "right") el.dispatchEvent(new MouseEvent("contextmenu", { button: 2, bubbles: true, cancelable: true, clientX: p.cx, clientY: p.cy }));
+        return "real";
+      } catch (e3) { fwd({ kind: "click", x: xPct, y: yPct, button: button || "left", count: count || 1 }); return "msg"; }
+    }
+    function frameMode() { return sameDoc() ? "real" : "msg"; }
+    function realType(text) {
+      let d = sameDoc();
+      if (d) {
+        try {
+          let a = d.activeElement;
+          if (!a || a === d.body) a = d.querySelector("input, textarea") || d.body;
+          if (a && a.focus) a.focus();
+          if (a && ("value" in a)) {
+            a.value = (a.value || "") + text;
+            a.dispatchEvent(new Event("input", { bubbles: true }));
+            a.dispatchEvent(new KeyboardEvent("keydown", { key: text.slice(-1), bubbles: true }));
+            return "real";
+          }
+        } catch (e) {}
+      }
+      fwd({ kind: "type", text: text });
+      return "msg";
+    }
+    let bar = document.createElement("div");
+    bar.style.cssText = "padding:8px 10px;background:#1c1c22;border-bottom:1px solid #333;font-size:13px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;";
+    bar.innerHTML = "<b>TouchBridge</b><span style=\"font:11px monospace;background:#000;padding:2px 8px;border-radius:20px;border:1px solid #444;\">" + mode + "</span>";
+    let urlIn = document.createElement("input");
+    urlIn.value = target; urlIn.style.cssText = "flex:1;min-width:160px;background:#0f0f14;color:#eee;border:1px solid #444;border-radius:8px;padding:7px;font-size:13px;";
+    urlIn.placeholder = "URL or perchance generator name";
+    let loadB = mkBtn("Load"), selfB = mkBtn("This plugin page"), doorsB = mkBtn("Macrohard Doors"), noDispB = mkBtn("Can't display? rebuild"), ovB = mkBtn("Overlay capture: OFF");
+    let recB = mkBtn("Record macro"), playB = mkBtn("Replay macro"), clrB = mkBtn("Clear macro");
+    let recInfo = document.createElement("span");
+    recInfo.style.cssText = "font:11px monospace;background:#000;padding:2px 8px;border-radius:20px;border:1px solid #444;";
+    recInfo.textContent = "macro 0";
+    bar.appendChild(urlIn); bar.appendChild(loadB); bar.appendChild(selfB); bar.appendChild(doorsB); bar.appendChild(noDispB); bar.appendChild(ovB); bar.appendChild(recB); bar.appendChild(playB); bar.appendChild(clrB); bar.appendChild(recInfo);
+    mount.appendChild(bar);
+    function panel(title) { let p = document.createElement("div"); p.style.cssText = "background:#1a1a20;border:1px solid #333;border-radius:10px;padding:8px;"; let h = document.createElement("h3"); h.style.cssText = "margin:0 0 6px;font-size:13px;color:#9fd;"; h.textContent = title; p.appendChild(h); return p; }
+    let pAi = panel("AI text to touch actions");
+    pAi.style.margin = "8px 8px 0";
+    let aiIn = document.createElement("textarea");
+    aiIn.rows = 2; aiIn.style.cssText = "width:100%;box-sizing:border-box;background:#0f0f14;color:#eee;border:1px solid #444;border-radius:8px;padding:7px;font-size:13px;";
+    aiIn.value = "Tap the login area, then type hello@example.com, then left-click submit.";
+    let aiRow = document.createElement("div");
+    aiRow.style.cssText = "display:flex;gap:6px;margin:6px 0;";
+    let aiRun = mkBtn("Translate"), aiExec = mkBtn("Execute plan");
+    aiRow.appendChild(aiRun); aiRow.appendChild(aiExec); pAi.appendChild(aiIn); pAi.appendChild(aiRow);
+    let aiOut = document.createElement("div");
+    aiOut.style.cssText = "font:12px monospace;background:#000;padding:6px;border-radius:8px;min-height:34px;white-space:pre-wrap;";
+    aiOut.textContent = "plan appears here";
+    pAi.appendChild(aiOut);
+    mount.appendChild(pAi);
+    let pFrame = panel("Target frame (uid embed / srcdoc)");
+    pFrame.style.margin = "8px 8px 0";
+    let wrap = null, fr = null, ov = null, ovCanvas = null, ovCur = null;
+    if (noFrame) {
+      let nf = document.createElement("div");
+      nf.style.cssText = "font:12px monospace;background:#000;padding:8px;border-radius:8px;";
+      nf.textContent = depth >= 2 ? "Frame omitted: nesting limit reached (this copy is already inside two TouchBridge frames)." : "Frameless instance (frame = false): control surface + TouchBridge API only. Incoming postMessages still work if the framed side has the receiver.";
+      pFrame.appendChild(nf);
+    } else {
+      wrap = document.createElement("div");
+      wrap.style.cssText = "position:relative;height:420px;border:1px solid #444;border-radius:10px;overflow:hidden;background:#fff;";
+      fr = document.createElement("iframe");
+      fr.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms");
+      fr.src = S.embed; fr.style.cssText = "width:100%;height:100%;border:0;";
+      ov = document.createElement("div");
+      ov.style.cssText = "position:absolute;inset:0;touch-action:none;background:rgba(61,107,255,.06);pointer-events:none;";
+      ovCanvas = document.createElement("canvas");
+      ovCanvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;";
+      ovCur = document.createElement("div");
+      ovCur.style.cssText = "position:absolute;width:18px;height:18px;border-radius:50%;background:rgba(0,255,255,.85);border:2px solid #fff;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 10px #0ff;z-index:3;";
+      ov.appendChild(ovCanvas); ov.appendChild(ovCur);
+      wrap.appendChild(fr); wrap.appendChild(ov); pFrame.appendChild(wrap);
+    }
+    let row = document.createElement("div");
+    row.style.cssText = "display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;";
+    let pmClick = mkBtn("msg click"), pmScroll = mkBtn("msg scroll"), pmHi = mkBtn("msg type Hi");
+    row.appendChild(pmClick); row.appendChild(pmScroll); row.appendChild(pmHi); pFrame.appendChild(row);
+    let realmEl = document.createElement("div");
+    realmEl.style.cssText = "font:11px monospace;background:#000;padding:6px;border-radius:8px;margin-top:6px;min-height:34px;white-space:pre-wrap;";
+    realmEl.textContent = "postMessage realm log: (messages from iframes appear here)";
+    pFrame.appendChild(realmEl);
+    mount.appendChild(pFrame);
+    let lower = document.createElement("div");
+    lower.style.cssText = "display:grid;grid-template-columns:1fr 300px;gap:8px;padding:8px;";
+    mount.appendChild(lower);
+    let leftCol = document.createElement("div");
+    leftCol.style.cssText = "display:flex;flex-direction:column;gap:8px;min-width:0;";
+    let rightCol = document.createElement("div");
+    rightCol.style.cssText = "display:flex;flex-direction:column;gap:8px;min-width:0;";
+    lower.appendChild(leftCol); lower.appendChild(rightCol);
+    let pTouch = panel("Touch keyboard + pointer");
+    let typeIn = document.createElement("input");
+    typeIn.placeholder = "tap keys to type here"; typeIn.style.cssText = "width:100%;box-sizing:border-box;background:#0f0f14;color:#eee;border:1px solid #444;border-radius:8px;padding:7px;margin-bottom:6px;";
+    pTouch.appendChild(typeIn);
+    let kbd = document.createElement("div");
+    kbd.style.cssText = "display:flex;flex-direction:column;gap:4px;user-select:none;";
+    pTouch.appendChild(kbd);
+    function syncMods() { shB.textContent = "Shift:" + (S.shift ? "ON" : "OFF"); ctB.textContent = "Ctrl:" + (S.ctrl ? "ON" : "OFF"); alB.textContent = "Alt:" + (S.alt ? "ON" : "OFF"); }
+    let SHIFT_MAP = { "1": "!", "2": "@", "3": "#", "4": "$", "5": "%", "6": "^", "7": "&", "8": "*", "9": "(", "0": ")", "/": "?", ",": "<", ".": ">", ";": ":", "[": "{", "]": "}", "-": "_", "=": "+" };
+    function dispatchKey(raw) {
+      let key = raw;
+      if (raw.length === 1 && S.shift && SHIFT_MAP[raw]) key = SHIFT_MAP[raw];
+      else if (raw.length === 1 && S.shift && /[a-z]/.test(raw)) key = raw.toUpperCase();
+      let el = document.activeElement, tgt = (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA")) ? el : typeIn;
+      if (key === "Backspace") tgt.value = tgt.value.slice(0, -1);
+      else if (key === "Enter") tgt.value += "\n";
+      else if (key === "Tab") tgt.value += "\t";
+      else if (key === "Space") tgt.value += " ";
+      else if (key.length === 1 && !S.ctrl && !S.alt) { let s = (tgt.selectionStart == null ? tgt.value.length : tgt.selectionStart); tgt.value = tgt.value.slice(0, s) + key + tgt.value.slice(tgt.selectionEnd == null ? s : tgt.selectionEnd); }
+      try { tgt.focus(); } catch (e) {}
+      let init = { key: key, ctrlKey: S.ctrl, altKey: S.alt, shiftKey: S.shift, bubbles: true, cancelable: true };
+      try { for (let i = 0; i < 3; i++) tgt.dispatchEvent(new KeyboardEvent(["keydown", "keypress", "keyup"][i], init)); } catch (e2) {}
+      log("key", { key: key }); fwd({ kind: "key", key: key, ctrl: S.ctrl, alt: S.alt, shift: S.shift });
+      record({ op: "key", key: key });
+      if (S.shift && raw.length === 1) { S.shift = false; syncMods(); }
+    }
+    function addKey(parentRow, k, label) { let b = document.createElement("div"); b.textContent = label || k; b.style.cssText = "flex:1;min-width:24px;padding:10px 0;text-align:center;background:#26262f;border:1px solid #4a4a5a;border-radius:8px;font-size:14px;touch-action:none;" + (String(k).length > 1 ? "flex:1.7;" : ""); b.addEventListener("pointerdown", function (e) { e.preventDefault(); dispatchKey(k); }); parentRow.appendChild(b); return b; }
+    [["1","2","3","4","5","6","7","8","9","0"],["q","w","e","r","t","y","u","i","o","p"],["a","s","d","f","g","h","j","k","l","Backspace"],["z","x","c","v","b","n","m",",",".","Enter"],["Space","Tab"]].forEach(function (r) { let d = document.createElement("div"); d.style.cssText = "display:flex;gap:4px;justify-content:center;"; r.forEach(function (k) { addKey(d, k === "Space" ? "Space" : k, k === "Space" ? "space" : k); }); kbd.appendChild(d); });
+    let modRow = document.createElement("div");
+    modRow.style.cssText = "display:flex;gap:6px;margin-top:6px;";
+    let shB = mkBtn("Shift:OFF"), ctB = mkBtn("Ctrl:OFF"), alB = mkBtn("Alt:OFF");
+    shB.onclick = function () { S.shift = !S.shift; syncMods(); }; ctB.onclick = function () { S.ctrl = !S.ctrl; syncMods(); log("mod", { ctrl: S.ctrl }); }; alB.onclick = function () { S.alt = !S.alt; syncMods(); log("mod", { alt: S.alt }); };
+    modRow.appendChild(shB); modRow.appendChild(ctB); modRow.appendChild(alB); pTouch.appendChild(modRow);
+    let pad = document.createElement("div");
+    pad.style.cssText = "position:relative;background:#0c0c12;border:1px solid #444;border-radius:10px;overflow:hidden;touch-action:none;height:120px;margin-top:6px;";
+    let ptrInfo = document.createElement("div");
+    ptrInfo.style.cssText = "font:11px monospace;background:#000;padding:2px 6px;border-radius:20px;border:1px solid #444;margin-top:6px;";
+    ptrInfo.textContent = "touches: 0";
+    pTouch.appendChild(pad); pTouch.appendChild(ptrInfo);
+    let active = new Map();
+    function padPos(e) { let r = pad.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * 100, y: (e.clientY - r.top) / r.height * 100 }; }
+    pad.addEventListener("pointerdown", function (e) { try { pad.setPointerCapture(e.pointerId); } catch (x) {} let p = padPos(e); active.set(e.pointerId, p); let d = document.createElement("div"); d.id = "d" + uid + e.pointerId; d.style.cssText = "position:absolute;width:40px;height:40px;border-radius:50%;background:rgba(61,107,255,.45);border:2px solid #3d6bff;transform:translate(-50%,-50%);pointer-events:none;"; d.style.left = p.x + "%"; d.style.top = p.y + "%"; pad.appendChild(d); log("pointer-down", { id: e.pointerId, x: Math.round(p.x), y: Math.round(p.y) }); ptrInfo.textContent = "touches: " + active.size; });
+    pad.addEventListener("pointermove", function (e) { if (!active.has(e.pointerId)) return; let p = padPos(e); active.set(e.pointerId, p); let d = document.getElementById("d" + uid + e.pointerId); if (d) { d.style.left = p.x + "%"; d.style.top = p.y + "%"; } ptrInfo.textContent = "touches: " + active.size; });
+    function padUp(e) { active.delete(e.pointerId); let d = document.getElementById("d" + uid + e.pointerId); if (d) d.remove(); log("pointer-up", { id: e.pointerId }); ptrInfo.textContent = "touches: " + active.size; }
+    pad.addEventListener("pointerup", padUp); pad.addEventListener("pointercancel", padUp);
+    leftCol.appendChild(pTouch);
+    let pLog = panel("Event log / API");
+    let logEl = document.createElement("div");
+    logEl.style.cssText = "height:130px;overflow:auto;background:#000;font:11px/1.4 monospace;padding:6px;white-space:pre-wrap;border-radius:8px;";
+    pLog.appendChild(logEl);
+    let dumpB = mkBtn("Dump state JSON");
+    dumpB.onclick = function () { logEl.textContent = JSON.stringify({ mouse: S.mouse, held: S.held, macro: S.macro.length, tail: S.log.slice(-10) }, null, 1); };
+    pLog.appendChild(dumpB);
+    let recv = document.createElement("div");
+    recv.style.cssText = "font:11px monospace;background:#000;padding:6px;border-radius:8px;margin-top:6px;white-space:pre-wrap;";
+    recv.textContent = "receiver for the FRAMED page (without this, cross-origin clicks/keys cannot land — browser security, no workaround). Paste into its HTML:\n<script>addEventListener(\"message\",e=>{let m=e.data;if(!m||!m.__touchBridge)return;let el=m.x!==undefined?document.elementFromPoint(innerWidth*m.x/100,innerHeight*m.y/100):document.activeElement||document.body;if(!el)return;let b=m.button===\"middle\"?1:m.button===\"right\"?2:0;let px=m.x!==undefined?innerWidth*m.x/100:0,py=m.y!==undefined?innerHeight*m.y/100:0;function dn(){let i={button:b,bubbles:true,cancelable:true,clientX:px,clientY:py};try{el.dispatchEvent(new PointerEvent(\"pointerdown\",i))}catch(x){}try{el.dispatchEvent(new MouseEvent(\"mousedown\",i))}catch(x){}}function up(){let i={button:b,bubbles:true,cancelable:true,clientX:px,clientY:py};try{el.dispatchEvent(new PointerEvent(\"pointerup\",i))}catch(x){}try{el.dispatchEvent(new MouseEvent(\"mouseup\",i))}catch(x){}}if(m.kind===\"mousedown\")dn();else if(m.kind===\"mouseup\")up();else if(m.kind===\"click\"){dn();up();try{el.dispatchEvent(new MouseEvent(\"click\",{button:b,bubbles:true,cancelable:true,clientX:px,clientY:py}))}catch(x){}try{el.focus()}catch(x){}if((m.count||1)>=2)for(let i=1;i<m.count;i++)try{el.dispatchEvent(new MouseEvent(\"dblclick\",{button:b,bubbles:true}))}catch(x){}if(m.button===\"right\")try{el.dispatchEvent(new MouseEvent(\"contextmenu\",{button:2,bubbles:true,cancelable:true}))}catch(x){}}else if(m.kind===\"wheel\")scrollBy(0,m.dy||100);else if(m.kind===\"type\"){let a=document.activeElement;if(a&&\"value\"in a){a.value=(a.value||\"\")+m.text;a.dispatchEvent(new Event(\"input\",{bubbles:true}))}}else if(m.kind===\"key\"){(document.activeElement||document.body).dispatchEvent(new KeyboardEvent(\"keydown\",{key:m.key,bubbles:true}))}});<\/script>";
+    pLog.appendChild(recv);
+    let copyRecvB = mkBtn("Copy receiver snippet");
+    copyRecvB.style.marginTop = "6px";
+    copyRecvB.onclick = function () { let t = recv.textContent; let s = t.slice(t.indexOf("<script>")); try { navigator.clipboard.writeText(s); log("receiver-copied", {}); } catch (e) { log("receiver-copy-fail", {}); } };
+    pLog.appendChild(copyRecvB);
+    leftCol.appendChild(pLog);
+    let pMouse = panel("Mouse pad + virtual cursor");
+    let track = document.createElement("div");
+    track.style.cssText = "position:relative;background:#0c0c12;border:1px solid #444;border-radius:10px;height:150px;touch-action:none;display:flex;align-items:center;justify-content:center;";
+    track.innerHTML = "<span style=\"opacity:.5;font-size:12px;\">TRACKPAD</span>";
+    let stage = document.createElement("div");
+    stage.style.cssText = "position:relative;background:#101018;border:1px solid #444;border-radius:10px;height:150px;overflow:hidden;margin-top:6px;";
+    let cur = document.createElement("div");
+    cur.style.cssText = "position:absolute;width:16px;height:16px;border-radius:50%;background:#0ff;border:2px solid #fff;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 10px #0ff;";
+    stage.appendChild(cur); pMouse.appendChild(track); pMouse.appendChild(stage);
+    let mInfo = document.createElement("div");
+    mInfo.style.cssText = "font:11px monospace;background:#000;padding:2px 6px;border-radius:20px;border:1px solid #444;margin-top:6px;";
+    pMouse.appendChild(mInfo);
+    function heldLabel() { let h = Object.keys(S.held).filter(function (k) { return S.held[k]; }); return h.length ? h.join("+") : "none"; }
+    let octx = ovCanvas ? ovCanvas.getContext("2d") : null;
+    function sizeOv() { if (!wrap || !ovCanvas) return; try { ovCanvas.width = wrap.clientWidth; ovCanvas.height = wrap.clientHeight; } catch (e) {} }
+    if (wrap) { try { new ResizeObserver(sizeOv).observe(wrap); } catch (e5) {} }
+    sizeOv();
+    function dotOnOverlay(x, y, color) {
+      if (!octx || !ovCanvas) return;
+      octx.fillStyle = color || "rgba(0,255,255,.55)";
+      octx.beginPath(); octx.arc(x / 100 * ovCanvas.width, y / 100 * ovCanvas.height, 3, 0, 7); octx.fill();
+    }
+    function rippleOnOverlay(x, y, color) {
+      if (!ov) return;
+      let s = document.createElement("div");
+      s.style.cssText = "position:absolute;width:34px;height:34px;border-radius:50%;border:3px solid " + (color || "#ff0") + ";transform:translate(-50%,-50%);pointer-events:none;z-index:4;";
+      s.style.left = x + "%"; s.style.top = y + "%";
+      ov.appendChild(s); setTimeout(function () { s.remove(); }, 650);
+    }
+    function drawCur() {
+      cur.style.left = S.mouse.x + "%"; cur.style.top = S.mouse.y + "%";
+      if (ovCur) { ovCur.style.left = S.mouse.x + "%"; ovCur.style.top = S.mouse.y + "%"; }
+      mInfo.textContent = "x:" + Math.round(S.mouse.x) + " y:" + Math.round(S.mouse.y) + " held:" + heldLabel();
+    }
+    drawCur();
+    function stepMove(x, y) { S.mouse.x = Math.max(0, Math.min(100, x)); S.mouse.y = Math.max(0, Math.min(100, y)); drawCur(); dotOnOverlay(S.mouse.x, S.mouse.y, (S.held.left || S.held.middle || S.held.right) ? "rgba(255,136,0,.7)" : "rgba(0,255,255,.55)"); fwd({ kind: "mouse", how: (S.held.left || S.held.middle || S.held.right) ? "drag" : "hover", x: Math.round(S.mouse.x * 10) / 10, y: Math.round(S.mouse.y * 10) / 10, held: heldLabel() }); }
+    async function traceTo(tx, ty) { tx = Math.max(0, Math.min(100, tx)); ty = Math.max(0, Math.min(100, ty)); let sx = S.mouse.x, sy = S.mouse.y; let dist = Math.hypot(tx - sx, ty - sy); let steps = Math.max(2, Math.min(90, Math.round(dist * 1.6))); for (let i = 1; i <= steps; i++) { stepMove(sx + (tx - sx) * i / steps, sy + (ty - sy) * i / steps); await new Promise(function (r) { setTimeout(r, 28); }); } log("trace-done", { x: Math.round(S.mouse.x), y: Math.round(S.mouse.y) }); record({ op: "trace", x: Math.round(tx), y: Math.round(ty) }); }
+    function mDown(btn) { if (S.held[btn]) return; S.held[btn] = true; drawCur(); rippleOnOverlay(S.mouse.x, S.mouse.y, "#f80"); log("mousedown", { button: btn }); fwd({ kind: "mousedown", button: btn, x: Math.round(S.mouse.x), y: Math.round(S.mouse.y) }); record({ op: "down", button: btn }); }
+    function mUp(btn) { if (!S.held[btn]) return; S.held[btn] = false; drawCur(); log("mouseup", { button: btn }); fwd({ kind: "mouseup", button: btn, x: Math.round(S.mouse.x), y: Math.round(S.mouse.y) }); record({ op: "up", button: btn }); }
+    async function mClick(btn, n) { n = n || 1; for (let i = 0; i < n; i++) { mDown(btn); await new Promise(function (r) { setTimeout(r, 70); }); mUp(btn); if (i < n - 1) await new Promise(function (r) { setTimeout(r, 90); }); } let how = realClick(S.mouse.x, S.mouse.y, btn, n); rippleOnOverlay(S.mouse.x, S.mouse.y, "#ff0"); log("click", { button: btn, count: n, via: how }); record({ op: "click", button: btn, count: n }); }
+    let lastT = null;
+    track.addEventListener("pointerdown", function (e) { try { track.setPointerCapture(e.pointerId); } catch (x) {} lastT = { x: e.clientX, y: e.clientY }; });
+    track.addEventListener("pointermove", function (e) { if (!lastT) return; let dx = (e.clientX - lastT.x) / track.clientWidth * 40, dy = (e.clientY - lastT.y) / track.clientHeight * 40; lastT = { x: e.clientX, y: e.clientY }; stepMove(S.mouse.x + dx, S.mouse.y + dy); });
+    track.addEventListener("pointerup", function () { lastT = null; });
+    stage.addEventListener("pointerdown", async function (e) { let r = stage.getBoundingClientRect(); await traceTo((e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100); mClick("left", 1); });
+    let mRow = document.createElement("div");
+    mRow.style.cssText = "display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;";
+    [["Left","left"],["Middle","middle"],["Right","right"]].forEach(function (pair) { let b = mkBtn(pair[0]); b.onclick = function () { mClick(pair[1], 1); }; mRow.appendChild(b); });
+    let dbl = mkBtn("2x L"); dbl.onclick = function () { mClick("left", 2); }; mRow.appendChild(dbl);
+    let dblR = mkBtn("2x R"); dblR.onclick = function () { mClick("right", 2); }; mRow.appendChild(dblR);
+    let triL = mkBtn("3x L"); triL.onclick = function () { mClick("left", 3); }; mRow.appendChild(triL);
+    let triR = mkBtn("3x R"); triR.onclick = function () { mClick("right", 3); }; mRow.appendChild(triR);
+    [["Hold L","left"],["Hold M","middle"],["Hold R","right"]].forEach(function (pair) { let b = mkBtn(pair[0]); b.onclick = function () { mDown(pair[1]); }; mRow.appendChild(b); });
+    [["Rel L","left"],["Rel M","middle"],["Rel R","right"]].forEach(function (pair) { let b = mkBtn(pair[0]); b.onclick = function () { mUp(pair[1]); }; mRow.appendChild(b); });
+    let wU = mkBtn("wheel -"); wU.onclick = function () { log("wheel", { dy: -100 }); fwd({ kind: "wheel", dy: -100 }); record({ op: "wheel", dy: -100 }); };
+    let wD = mkBtn("wheel +"); wD.onclick = function () { log("wheel", { dy: 100 }); fwd({ kind: "wheel", dy: 100 }); record({ op: "wheel", dy: 100 }); };
+    mRow.appendChild(wU); mRow.appendChild(wD); pMouse.appendChild(mRow);
+    let ovClearB = mkBtn("Clear overlay trails");
+    ovClearB.style.marginTop = "6px";
+    ovClearB.onclick = function () { try { octx.clearRect(0, 0, ovCanvas.width, ovCanvas.height); } catch (e) {} };
+    pMouse.appendChild(ovClearB);
+    rightCol.appendChild(pMouse);
+    async function aiTranslate() {
+      aiOut.textContent = "translating…";
+      let instruction = "Translate this touchscreen instruction into a JSON array of actions. Actions: {\"op\":\"trace\",\"x\":0-100,\"y\":0-100}, {\"op\":\"down\",\"button\":\"left\"}, {\"op\":\"up\",\"button\":\"left\"}, {\"op\":\"click\",\"button\":\"left\",\"count\":1}, {\"op\":\"type\",\"text\":\"...\"}, {\"op\":\"key\",\"key\":\"Enter\"}, {\"op\":\"wheel\",\"dy\":100}. Reply ONLY JSON array. Instruction: " + aiIn.value;
+      try {
+        let gt = null;
+        try { gt = root.generateText; } catch (e0) {}
+        if (!gt) { try { gt = window.generateText; } catch (e0b) {} }
+        if (gt) {
+          let plan = await gt(instruction);
+          aiOut.textContent = String(plan);
+        } else throw 0;
+      } catch (e) {
+        let t = aiIn.value.toLowerCase(); let arr = [];
+        if (t.indexOf("login") >= 0) arr.push({ op: "trace", x: 50, y: 30 });
+        else arr.push({ op: "trace", x: 50, y: 50 });
+        let mt = aiIn.value.match(/type\\s+([^,]+)/i);
+        if (mt) arr.push({ op: "type", text: mt[1].trim() });
+        if (t.indexOf("submit") >= 0 || t.indexOf("click") >= 0) arr.push({ op: "click", button: "left", count: 1 });
+        if (t.indexOf("scroll") >= 0) arr.push({ op: "wheel", dy: 200 });
+        aiOut.textContent = JSON.stringify(arr);
+      }
+      log("ai-plan", { plan: aiOut.textContent.slice(0, 200) });
+    }
+    async function execArr(arr) {
+      for (let a of arr) {
+        if (a.op === "trace") await traceTo(a.x, a.y);
+        else if (a.op === "down") mDown(a.button || "left");
+        else if (a.op === "up") mUp(a.button || "left");
+        else if (a.op === "click") await mClick(a.button || "left", a.count || 1);
+        else if (a.op === "type") { let how = realType(String(a.text)); for (let ch of String(a.text)) dispatchKey(ch); log("type", { via: how }); }
+        else if (a.op === "key") dispatchKey(a.key);
+        else if (a.op === "wheel") { fwd({ kind: "wheel", dy: a.dy || 100 }); }
+        await new Promise(function (r) { setTimeout(r, 350); });
+      }
+    }
+    aiRun.onclick = aiTranslate;
+    aiExec.onclick = async function () {
+      let t = aiOut.textContent, arr;
+      try { arr = JSON.parse(t.slice(t.indexOf("["), t.lastIndexOf("]") + 1)); } catch (e) { return; }
+      execArr(arr);
+    };
+    function loadTarget(t) {
+      if (!fr) { log("no-frame", { note: "frameless instance" }); return; }
+      t = String(t).trim(); if (!t) return;
+      let ni = toEmbedUrl(t); S.embed = ni.embed; S.genName = ni.genName; S.isGen = ni.isGen;
+      fr.removeAttribute("srcdoc"); fr.src = S.embed; log("iframe-load", { u: S.embed });
+    }
+    loadB.onclick = function () { loadTarget(urlIn.value); };
+    selfB.onclick = function () { let u = gPid ? "https://" + gPid + ".perchance.org/" + gName + "#tbembed" : "https://null.perchance.org/" + gName + "#tbembed"; urlIn.value = u; loadTarget(u); };
+    doorsB.onclick = function () { let u = "https://perchance.org/i-am-canceled-presents-macrohard-doors-os"; urlIn.value = u; loadTarget(u); };
+    let ovOn = false;
+    if (!ov) ovB.textContent = "Overlay: n/a (no frame)";
+    ovB.onclick = function () { if (!ov) return; ovOn = !ovOn; ov.style.pointerEvents = ovOn ? "auto" : "none"; ovB.textContent = "Overlay capture: " + (ovOn ? "ON" : "OFF"); log("overlay", { on: ovOn }); };
+    function ovPct(e) { let r = wrap.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * 100, y: (e.clientY - r.top) / r.height * 100 }; }
+    if (ov) {
+    ov.addEventListener("pointerdown", async function (e) {
+      let p = ovPct(e);
+      log("iframe-touch", { phase: "start", x: Math.round(p.x), y: Math.round(p.y) });
+      await traceTo(p.x, p.y);
+      let how = realClick(p.x, p.y, "left");
+      rippleOnOverlay(p.x, p.y, "#ff0");
+      log("iframe-tap", { via: how });
+      record({ op: "trace", x: Math.round(p.x), y: Math.round(p.y) });
+      record({ op: "click", button: "left", count: 1 });
+      fwd({ kind: "touch", phase: "start" });
+    });
+    ov.addEventListener("pointermove", function (e) { if (e.buttons) { let p = ovPct(e); dotOnOverlay(p.x, p.y, "rgba(255,136,0,.7)"); fwd({ kind: "touch", phase: "move" }); } });
+    ov.addEventListener("pointerup", function (e) { fwd({ kind: "touch", phase: "end" }); });
+    ov.addEventListener("wheel", function (e) { e.preventDefault(); fwd({ kind: "wheel", dy: e.deltaY }); }, { passive: false });
+    }
+    function hookFrameDoc() {
+      let d = sameDoc();
+      if (!d || d.__tbHooked) return;
+      try {
+        d.__tbHooked = true;
+        d.addEventListener("click", function (e) {
+          let r = fr.getBoundingClientRect();
+          let x = (e.clientX / r.width) * 100, y = (e.clientY / r.height) * 100;
+          log("iframe-click", { x: Math.round(x), y: Math.round(y) });
+          dotOnOverlay(x, y, "rgba(255,255,0,.8)"); rippleOnOverlay(x, y, "#ff0");
+          if (!e.isTrusted) return;
+          record({ op: "trace", x: Math.round(x), y: Math.round(y) });
+          record({ op: "click", button: "left", count: 1 });
+        });
+        let lastH = 0;
+        d.addEventListener("pointermove", function (e) {
+          let now = Date.now();
+          if (now - lastH < 120) return;
+          lastH = now;
+          let r = fr.getBoundingClientRect();
+          dotOnOverlay((e.clientX / r.width) * 100, (e.clientY / r.height) * 100, "rgba(0,255,255,.4)");
+        });
+        d.addEventListener("keydown", function (e) { log("iframe-key", { key: e.key }); });
+        log("frame-hook", { ok: true });
+      } catch (e) {}
+    }
+    if (fr) { try { fr.addEventListener("load", hookFrameDoc); } catch (e6) {} }
+    if (fr) { try {
+      fr.addEventListener("load", function () {
+        setTimeout(function () {
+          if (sameDoc()) { log("frame-mode", { mode: "real-dispatch" }); }
+          else { log("frame-mode", { mode: "cross-origin-postMessage", note: "clicks need the receiver in the framed page" }); }
+        }, 900);
+      });
+    } catch (e7) {} }
+    setTimeout(hookFrameDoc, 2500);
+    pmClick.onclick = function () { let how = realClick(50, 50, "left"); rippleOnOverlay(50, 50, "#ff0"); log("msg-click", { via: how }); };
+    pmScroll.onclick = function () { let d = sameDoc(); if (d) { try { d.defaultView.scrollBy(0, 200); log("scroll", { via: "real" }); return; } catch (e) {} } fwd({ kind: "wheel", dy: 200 }); };
+    pmHi.onclick = function () { let how = realType("Hi"); log("type", { via: how }); };
+    noDispB.onclick = async function () {
+      if (!fr) { log("no-frame", { note: "frameless instance" }); return; }
+      realmEl.textContent = "rebuilding as srcdoc clone…";
+      try {
+        if (S.genName) {
+          let r = await fetch("https://perchance.org/api/getGeneratorsAndDependencies?generatorNames=" + encodeURIComponent(S.genName)).then(function (x) { return x.json(); });
+          let g = r.generators && r.generators[S.genName];
+          if (!g) throw new Error("generator not found");
+          let code = g.code || "", htmlSrc = g.html || "";
+          let doc = "<!DOCTYPE html><html><head><base href=\"https://perchance.org/" + S.genName + "\"><style>body{margin:0}</style></head><body>" + htmlSrc + "<script>" + code.replace(/<\/script/gi, "<\\/script") + "<\/script></body></html>";
+          fr.removeAttribute("src"); fr.srcdoc = doc;
+          setTimeout(hookFrameDoc, 1200);
+          log("srcdoc-rebuild", { gen: S.genName, bytes: doc.length });
+          realmEl.textContent = "srcdoc clone live for generator '" + S.genName + "' (" + doc.length + " bytes). Clicks/keys now dispatch for real into the clone; cross-origin nav is shown here as rebuilds; postMessages still captured below.";
+        } else {
+          let txt = await fetch(S.embed).then(function (x) { return x.text(); });
+          let doc = "<base href=\"" + S.embed + "\">" + txt;
+          fr.removeAttribute("src"); fr.srcdoc = doc;
+          setTimeout(hookFrameDoc, 1200);
+          log("srcdoc-rebuild", { url: S.embed });
+          realmEl.textContent = "srcdoc clone live (" + doc.length + " bytes). Sites with frame/CSP/CORS limits may render partially; that is a browser security rule, not a plugin bug.";
+        }
+      } catch (e) { realmEl.textContent = "rebuild failed: " + (e && e.message || e) + "\nUse a perchance generator target for full rebuilds."; log("rebuild-fail", { err: String(e && e.message || e) }); }
+    };
+    recB.onclick = function () { S.recording = !S.recording; recB.textContent = S.recording ? "Stop recording" : "Record macro"; recInfo.textContent = S.recording ? "REC " + S.macro.length : "macro " + S.macro.length; log("macro-record", { on: S.recording }); };
+    playB.onclick = function () { log("macro-replay", { n: S.macro.length }); execArr(S.macro.slice()); };
+    clrB.onclick = function () { S.macro = []; recInfo.textContent = "macro 0"; log("macro-clear", {}); };
+    if (!window.__touchBridgeMsgHook) {
+      window.__touchBridgeMsgHook = true;
+      window.addEventListener("message", function (e) {
+        let m = e.data;
+        if (!m || !m.__touchBridgeReply) return;
+        for (let k in (window.__touchBridges || {})) {
+          let inst = window.__touchBridges[k];
+          if (inst && inst.realmEl) {
+            inst.msgCount++;
+            inst.realmEl.textContent = "realm msg #" + inst.msgCount + " from " + e.origin + ":\n" + JSON.stringify(m).slice(0, 500);
+          }
+        }
+      });
+    }
+    S.realmEl = realmEl;
+    S.mounted = true;
+    S.api = { move: function (x, y) { stepMove(x, y); }, trace: traceTo, click: mClick, down: mDown, up: mUp, key: dispatchKey, type: realType, tap: function (x, y) { return traceTo(x, y).then(function () { return mClick("left", 1); }); }, send: fwd, record: record, replay: function () { execArr(S.macro.slice()); }, get macro() { return S.macro; }, get log() { return S.log; }, get state() { return { mouse: S.mouse, held: S.held }; }, frame: fr };
+    if (!window.TouchBridge) window.TouchBridge = S.api;
+    hookFrameDoc();
+    log("mount", { mode: mode, embed: S.embed });
+  };
+  setTimeout(boot, 50);
+  return html;
