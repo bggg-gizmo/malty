@@ -1,0 +1,92 @@
+[
+    {
+        "path":  "src/allies.js",
+        "bytes":  6087,
+        "sha256":  "2b3ff4be8ffc54db2504044b4ec8d66e0f567d24b1a2a534a6e55d03d174438a",
+        "key":  "5d1ddd082001bfb423959688d1349834.js"
+    },
+    {
+        "path":  "src/bridge-capability.md",
+        "bytes":  25989,
+        "sha256":  "cfc1c7c575b1bc50a56135b5fc5115c8d19157a52e247814a318ad81a5879930",
+        "key":  "efe5fcb185c624b9b0fa74aeb79eb2ce.txt"
+    },
+    {
+        "path":  "src/bridge-team.js",
+        "bytes":  100235,
+        "sha256":  "e35b39a6fc6bfac96d98605055b62999cf56023ebc52314c16ce148dc441bced",
+        "key":  "01d287cc7f9a6a94fa97bee3a31f63cc.js"
+    },
+    {
+        "path":  "src/cron.js",
+        "bytes":  22809,
+        "sha256":  "9b1b1eef4659fddcd9363d354f485937a0a85ddbf4c9f4e9ef052def1d20ba33",
+        "key":  "408791887103dae09c07773be4b59265.js"
+    },
+    {
+        "path":  "src/fallback-llm.js",
+        "bytes":  6390,
+        "sha256":  "12f266be16020054623ac9e14f1d018c71ad9daace7e49c476e8ae40fb6803c3",
+        "key":  "bcad456206031087eb5f46ae4ce9b6c9.js"
+    },
+    {
+        "path":  "src/fleet.js",
+        "bytes":  12140,
+        "sha256":  "d41959635f5b64486354d09271ff1e4c915aa3525c9906946d8dbb1a61fe92eb",
+        "key":  "7b936b3de11db109cb77149ea77d8473.js"
+    },
+    {
+        "path":  "src/governor.js",
+        "bytes":  5755,
+        "sha256":  "c4ed78363e6f1891cbb78d9bbc51c7b4f31c3e8d542161c97ad092d0b94544ba",
+        "key":  "64f20f87ef6469f807030dbab2b2ed00.js"
+    },
+    {
+        "path":  "src/infra.js",
+        "bytes":  6471,
+        "sha256":  "b8803c0a57b949bf6c67e143897a4c481f3c32374dbaae8d5cc96adf7efcec16",
+        "key":  "7ae31ab3b5f3b366fa453886e50211cd.js"
+    },
+    {
+        "path":  "src/intel.js",
+        "bytes":  8277,
+        "sha256":  "99e3a85d96b9de55a6f455ef4ec4b9caf14a3802b84b87ad6c00b8c075d7ce73",
+        "key":  "4f0ddf3501ec393de9baba2eb7c67ee7.js"
+    },
+    {
+        "path":  "src/moltbook.js",
+        "bytes":  12656,
+        "sha256":  "0e985ab958bba19468e2d799c595c9c4572e1e6278cfe85298d9725ae9f38210",
+        "key":  "e83d6c15e61fd592df319c047c0f68fc.js"
+    },
+    {
+        "path":  "src/README.md",
+        "bytes":  10070,
+        "sha256":  "2e33cba58b5e06f1ba7d1ab1f0bc94165e56ad8d06e8a32d011023eb11e7b865",
+        "key":  "b98b126c6ee83d8c6331570943d7fde5.txt"
+    },
+    {
+        "path":  "src/rooms/heartbeat-lab.html",
+        "bytes":  2786,
+        "sha256":  "dad2b3cba1d8b1044f9684e0719c563cb73acaf2d352ea70800f3c6d35712eb7",
+        "key":  "77ecad091642b3360d49fcd569218ad2.txt"
+    },
+    {
+        "path":  "src/solver.js",
+        "bytes":  75935,
+        "sha256":  "634f30e10c0f65aaea05269d9d8be5c4104e345a1572ccbbc80af936c11e0288",
+        "key":  "f1238d157edb0591649dc54cee373ba8.js"
+    },
+    {
+        "path":  "src/thinking-backsteps.js",
+        "bytes":  5818,
+        "sha256":  "84d67351b4cb7a99393fd1b37f49cb5d3440bc439f876e3b3b5f7e117b7f43b1",
+        "key":  "4200c473c495e362246d663eac257911.js"
+    },
+    {
+        "path":  "src/webmesh-mesh.js",
+        "bytes":  8863,
+        "sha256":  "138170d39c28e1d175fb998b444242ed02e859dc1e3fd4d125b2738e2cbb7510",
+        "key":  "c61da88fb14cd0d8cb505ef6cff334fd.js"
+    }
+]

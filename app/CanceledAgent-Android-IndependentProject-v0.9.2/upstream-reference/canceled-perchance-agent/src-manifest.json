@@ -1,0 +1,62 @@
+{
+    "moltbook.js":  {
+                        "key":  "e83d6c15e61fd592df319c047c0f68fc.js",
+                        "size":  12656
+                    },
+    "README.md":  {
+                      "key":  "b98b126c6ee83d8c6331570943d7fde5.txt",
+                      "size":  10070
+                  },
+    "fallback-llm.js":  {
+                            "key":  "bcad456206031087eb5f46ae4ce9b6c9.js",
+                            "size":  6390
+                        },
+    "cron.js":  {
+                    "key":  "408791887103dae09c07773be4b59265.js",
+                    "size":  22809
+                },
+    "solver.js":  {
+                      "key":  "f1238d157edb0591649dc54cee373ba8.js",
+                      "size":  75935
+                  },
+    "governor.js":  {
+                        "key":  "64f20f87ef6469f807030dbab2b2ed00.js",
+                        "size":  5755
+                    },
+    "rooms/heartbeat-lab.html":  {
+                                     "key":  "77ecad091642b3360d49fcd569218ad2.txt",
+                                     "size":  2786
+                                 },
+    "thinking-backsteps.js":  {
+                                  "key":  "4200c473c495e362246d663eac257911.js",
+                                  "size":  5818
+                              },
+    "bridge-team.js":  {
+                           "key":  "01d287cc7f9a6a94fa97bee3a31f63cc.js",
+                           "size":  100235
+                       },
+    "bridge-capability.md":  {
+                                 "key":  "efe5fcb185c624b9b0fa74aeb79eb2ce.txt",
+                                 "size":  25989
+                             },
+    "webmesh-mesh.js":  {
+                            "key":  "c61da88fb14cd0d8cb505ef6cff334fd.js",
+                            "size":  8863
+                        },
+    "fleet.js":  {
+                     "key":  "7b936b3de11db109cb77149ea77d8473.js",
+                     "size":  12140
+                 },
+    "intel.js":  {
+                     "key":  "4f0ddf3501ec393de9baba2eb7c67ee7.js",
+                     "size":  8277
+                 },
+    "allies.js":  {
+                      "key":  "5d1ddd082001bfb423959688d1349834.js",
+                      "size":  6087
+                  },
+    "infra.js":  {
+                     "key":  "7ae31ab3b5f3b366fa453886e50211cd.js",
+                     "size":  6471
+                 }
+}
