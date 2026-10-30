@@ -1,0 +1,13 @@
+const fs = require('fs');
+const vm = require('vm');
+const path = require('path');
+const root = path.resolve(__dirname, '..');
+const code = fs.readFileSync(path.join(root, 'android/app/src/main/assets/solver-engine.js'), 'utf8');
+const context = { window: {} };
+vm.createContext(context);
+vm.runInContext(code, context, { filename: 'solver-engine.js', timeout: 10000 });
+const result = vm.runInContext('runSolverTests()', context, { timeout: 10000 });
+const passing = result.filter(r => r.pass).length;
+console.log(`Android-bundled deterministic solver: ${passing}/${result.length} cases passed`);
+for (const failure of result.filter(r => !r.pass)) console.log('FAIL:', JSON.stringify(failure));
+if (passing !== result.length) process.exit(1);

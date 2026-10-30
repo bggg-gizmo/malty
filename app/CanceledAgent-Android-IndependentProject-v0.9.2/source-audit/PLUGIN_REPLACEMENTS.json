@@ -1,0 +1,78 @@
+{
+  "original": "canceled-perchance-agent/main.pjs",
+  "integrationRule": "No Perchance platform calls are permitted from the installed Android application or its independent backend.",
+  "plugins": {
+    "ai-helper-blueprint-plugin": {
+      "replacement": [
+        "android/app/src/main/java/org/canceledagent/app/WorkflowProfile.java",
+        "android/app/src/main/java/org/canceledagent/app/BlueprintProtocol.java",
+        "android/app/src/main/java/org/canceledagent/app/BlueprintActivity.java"
+      ],
+      "scope": "Local adoption of protocol source, mode and overlay snapshot, SHA-256 verification, immutable audit and revision rollback; no remote instruction execution",
+      "status": "source-dependent-not-certified",
+      "remaining": "Exact behavior of the external Perchance plugin cannot be verified without that plugin’s original source",
+      "upstreamSourceAvailable": false
+    },
+    "canceled-codebase-generator-plugin": {
+      "replacement": [
+        "android/app/src/main/java/org/canceledagent/app/EditorActivity.java",
+        "android/app/src/main/java/org/canceledagent/app/LocalProjects.java"
+      ],
+      "scope": "On-device editable HTML, sandboxed preview, local version history, import/export, collaboration and share",
+      "status": "functional-independent",
+      "remaining": "Device-level runtime acceptance testing still required",
+      "upstreamSourceAvailable": false
+    },
+    "canceled-ai-helper-thinking-plugin": {
+      "replacement": [
+        "android/app/src/main/java/org/canceledagent/app/LocalProjects.java",
+        "android/app/src/main/java/org/canceledagent/app/EditorActivity.java"
+      ],
+      "scope": "On-device trace journal and linked backstep records stored in SQLite",
+      "status": "functional-independent",
+      "remaining": "Device-level runtime acceptance testing still required",
+      "upstreamSourceAvailable": false
+    },
+    "donation-link-2-ad": {
+      "replacement": [
+        "android/app/src/main/java/org/canceledagent/app/MainActivity.java"
+      ],
+      "scope": "User-configured HTTPS support links and wallet addresses with native clipboard actions",
+      "status": "functional-independent",
+      "remaining": "Device-level runtime acceptance testing still required",
+      "upstreamSourceAvailable": false
+    },
+    "canceled-touchscreen-api-plugin": {
+      "replacement": [
+        "android/app/src/main/java/org/canceledagent/app/TouchBridgeController.java",
+        "android/app/src/main/java/org/canceledagent/app/EditorActivity.java"
+      ],
+      "scope": "Persistent button mapping and profiles, pointer/touch gestures, keyboard events and HTML5 Gamepad API virtual controller for owned local preview",
+      "status": "source-dependent-not-certified",
+      "remaining": "Exact behavior of the external Perchance plugin cannot be verified without that plugin’s original source",
+      "upstreamSourceAvailable": false
+    },
+    "server-plugin": {
+      "replacement": [
+        "android/app/src/main/java/org/canceledagent/app/EmbeddedServer.java",
+        "android/app/src/main/java/org/canceledagent/app/EmbeddedService.java",
+        "android/app/src/main/java/org/canceledagent/app/LocalCore.java",
+        "android/app/src/main/java/org/canceledagent/app/OutboundBridge.java"
+      ],
+      "scope": "Android-owned persistent SQLite HTTP and WebSocket service, optional authenticated LAN hosting and outbound bridge relay, started and managed from the APK",
+      "status": "functional-independent",
+      "remaining": "Device-level runtime acceptance testing still required",
+      "upstreamSourceAvailable": false
+    },
+    "ai-text-plugin": {
+      "replacement": [
+        "android/app/src/main/java/org/canceledagent/app/EmbeddedServer.java",
+        "android/app/src/main/java/org/canceledagent/app/MainActivity.java"
+      ],
+      "scope": "Independent configurable OpenAI-compatible provider client and completion endpoints with no Perchance dependency",
+      "status": "functional-independent",
+      "remaining": "Provider credentials, API availability and actual runtime/network testing required for production certification",
+      "upstreamSourceAvailable": false
+    }
+  }
+}
