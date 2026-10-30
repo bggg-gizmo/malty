@@ -61,3 +61,8 @@ The runner verifies the already-published signed APK, requires exactly one autho
 24/24 new acceptance runner tests and 19/19 previous publisher/artifact tests passed locally. APK integrity and signing were checked again, with no application-code changes. ADB reported no attached device; no native Android acceptance passed yet. Live authenticated Moltbook/Bridge/provider transactions and complete external-plugin parity remain unverified. The public native GitHub Releases entry and active rulesets remain outstanding; the signed APK is still directly available through the public repository.
 
 No GitHub Actions, paid CI, PRs, force updates, unauthorized branches, private signing materials or app UI changes were introduced.
+
+
+## 2026-10-30 — public source verification
+
+All 234 source manifest paths are independently verified against live public GitHub blob hashes. The public Java Android source built successfully using Java 17, SDK API 36, Build Tools r36, and D8; the locally signed test APK verifies v2/v3. 39 Python backend tests, 92 solver cases, 9 Java WIRE cases, 11 Java race cases and additional host integration contracts passed. The historical standalone source ZIP contains a stale integration-audit script; GitHub's browsable source has the corrected version. README now prioritizes the generated current-branch ZIP; see `docs/SOURCE_PUBLICATION_VERIFICATION.md`. No app code/UI changes or paid GitHub Actions.

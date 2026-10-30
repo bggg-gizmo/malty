@@ -19,7 +19,7 @@
 <img alt="Append-only credits" src="assets/badges/credits.svg">
 </p>
 
-**[⬇ GET MALTY](downloads/v0.9.2/Malty-signed-v0.9.2.apk)** &nbsp;·&nbsp; **[DOWNLOAD FULL SOURCE](source/Malty-v0.9.2-Complete-Public-Source.zip)** &nbsp;·&nbsp; **[BROWSE SOURCE](app/CanceledAgent-Android-IndependentProject-v0.9.2/)** &nbsp;·&nbsp; **[CONTRIBUTE](CONTRIBUTING.md)** &nbsp;·&nbsp; **[REPORT BUGS](https://github.com/bggg-gizmo/malty/issues/new/choose)**
+**[⬇ GET MALTY](downloads/v0.9.2/Malty-signed-v0.9.2.apk)** &nbsp;·&nbsp; **[DOWNLOAD LATEST SOURCE](https://github.com/bggg-gizmo/malty/archive/refs/heads/main.zip)** &nbsp;·&nbsp; **[BROWSE SOURCE](app/CanceledAgent-Android-IndependentProject-v0.9.2/)** &nbsp;·&nbsp; **[CONTRIBUTE](CONTRIBUTING.md)** &nbsp;·&nbsp; **[REPORT BUGS](https://github.com/bggg-gizmo/malty/issues/new/choose)**
 
 <sub>Independent community application · Not affiliated with or endorsed by Moltbook</sub>
 
@@ -50,7 +50,7 @@ Installing an APK signed by a different certificate over an existing app will fa
 
 ## Build it yourself — complete source
 
-**[Download the complete public source ZIP](source/Malty-v0.9.2-Complete-Public-Source.zip)** (234 source files plus documentation and artwork; SHA-256 `26b09b3670b54ce5a09b29ae7c52dff1020198aea0c6282eab78706d309d8ef0`). The individual files are being mirrored to **[`app/CanceledAgent-Android-IndependentProject-v0.9.2/`](app/CanceledAgent-Android-IndependentProject-v0.9.2/)** for inline browsing and pull requests; until that mirror is complete, the verified ZIP is the complete source distribution. Historical private archives and local signing keys are intentionally excluded.
+**[Download the latest complete public source](https://github.com/bggg-gizmo/malty/archive/refs/heads/main.zip)** or **[browse all 234 verified source files](app/CanceledAgent-Android-IndependentProject-v0.9.2/)**. The current GitHub branch contains the corrected Perchance integration audit, full Android source, backend, tests, Studio/Canvas Editor, recovered plugin source, and build scripts. The [earlier standalone v0.9.2 ZIP](source/Malty-v0.9.2-Complete-Public-Source.zip) remains for provenance; that ZIP has an older integration-audit script and is not the recommended build snapshot. Historical private archives, personal records, and signing keys are excluded.
 
 ```sh
 git clone https://github.com/bggg-gizmo/malty.git
