@@ -101,14 +101,22 @@ def verify_remote_repository() -> str:
     apk_entry = entries.get("downloads/v0.9.2/" + ARTIFACT)
     if not apk_entry or apk_entry.get("sha") != GIT_BLOB_SHA1 or apk_entry.get("size") != BYTE_COUNT:
         raise PublicationError("Public main does not contain the exact approved APK Git blob")
-    if "downloads/v0.9.2/SHA256SUMS.txt" not in entries:
-        raise PublicationError("Public checksum file is missing")
+    checksum_bytes = CHECKSUMS.read_bytes()
+    expected_checksum_blob_sha = hashlib.sha1(
+        f"blob {len(checksum_bytes)}\0".encode("ascii") + checksum_bytes
+    ).hexdigest()
+    checksum_entry = entries.get("downloads/v0.9.2/SHA256SUMS.txt")
+    if (not checksum_entry or checksum_entry.get("sha") != expected_checksum_blob_sha
+            or checksum_entry.get("size") != len(checksum_bytes)):
+        raise PublicationError("Public checksum Git blob does not match approved SHA256SUMS.txt")
     return head_sha
 
 
 def validate_tag_target(head_sha: str, *, existing_release: bool) -> None:
     tag = api("repos/" + REPOSITORY + "/git/ref/tags/" + TAG, allow_missing=True)
     if tag is None:
+        if existing_release:
+            raise PublicationError("Existing release has no resolvable v0.9.2 Git tag")
         return  # gh release create will create the tag from the pinned --target commit.
     obj = tag.get("object", {})
     if obj.get("type") == "commit":
@@ -185,6 +193,9 @@ def publish(apksigner: str | None, check_only: bool) -> dict:
         gh("release", "create", TAG, str(APK), str(CHECKSUMS), "-R", REPOSITORY,
            "--target", head_sha, "--title", RELEASE_TITLE, "--notes-file", str(NOTES),
            "--prerelease", "--latest=false")
+    # Release creation can succeed while tag creation/readback is incomplete or
+    # inconsistent. Re-read the actual tag before claiming a verified release.
+    validate_tag_target(head_sha, existing_release=True)
     info = verify_release(head_sha)
     info.update({"repository": REPOSITORY, "main_commit_at_start": head_sha,
                  "local_artifact_verified": local["verified"], "status": "verified"})

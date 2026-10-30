@@ -20,11 +20,14 @@ HEAD = "a0095984e9e7011164cb3002b6b03e3ef3ab162a"
 
 
 class GitHubMock:
-    def __init__(self, existing=False, tag=False, tagsha=HEAD, wrong_apk=False):
+    def __init__(self, existing=False, tag=False, tagsha=HEAD, wrong_apk=False,
+                 wrong_checksum=False, release_without_tag=False):
         self.existing = existing
         self.tag = tag
         self.tagsha = tagsha
         self.wrong_apk = wrong_apk
+        self.wrong_checksum = wrong_checksum
+        self.release_without_tag = release_without_tag
         self.commands = []
 
     def release(self):
@@ -44,12 +47,15 @@ class GitHubMock:
         if endpoint == "git/ref/heads/main":
             return {"object": {"sha": HEAD}}
         if endpoint == "git/ref/tags/" + m.TAG:
-            return {"object": {"sha": self.tagsha, "type": "commit"}} if self.tag else None
+            return {"object": {"sha": self.tagsha, "type": "commit"}} if self.tag and not self.release_without_tag else None
         if endpoint.startswith("git/trees/"):
             return {"truncated": False, "tree": [
                 {"type": "blob", "path": "downloads/v0.9.2/" + m.ARTIFACT,
                  "sha": "x" * 40 if self.wrong_apk else m.GIT_BLOB_SHA1, "size": m.BYTE_COUNT},
-                {"type": "blob", "path": "downloads/v0.9.2/SHA256SUMS.txt", "sha": "s" * 40}]}
+                {"type": "blob", "path": "downloads/v0.9.2/SHA256SUMS.txt",
+                 "sha": "s" * 40 if self.wrong_checksum else m.hashlib.sha1(
+                     b"blob " + str(REAL_SUMS.stat().st_size).encode() + b"\0" + REAL_SUMS.read_bytes()
+                 ).hexdigest(), "size": REAL_SUMS.stat().st_size}]}
         if endpoint.startswith("compare/"):
             return {"behind_by": 0}
         if endpoint == "releases/tags/" + m.TAG:
@@ -126,6 +132,21 @@ class TestRelease(unittest.TestCase):
     def test_tag_tree_wrong_apk_rejected(self):
         self.fake(existing=True, tag=True, wrong_apk=True)
         with self.assertRaisesRegex(m.PublicationError, "approved APK|verified v0.9.2 APK"):
+            m.publish(None, False)
+
+    def test_checksum_blob_mismatch_rejected(self):
+        self.fake(wrong_checksum=True)
+        with self.assertRaisesRegex(m.PublicationError, "Public checksum Git blob"):
+            m.publish(None, False)
+
+    def test_preexisting_release_missing_tag_rejected(self):
+        self.fake(existing=True, tag=False)
+        with self.assertRaisesRegex(m.PublicationError, "no resolvable"):
+            m.publish(None, True)
+
+    def test_post_create_tag_readback_required(self):
+        self.fake(release_without_tag=True)
+        with self.assertRaisesRegex(m.PublicationError, "no resolvable"):
             m.publish(None, False)
 
     def test_draft_release_not_claimed_published(self):
