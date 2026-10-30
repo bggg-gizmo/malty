@@ -1,0 +1,31 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.canceledagent.app">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <application android:allowBackup="false" android:usesCleartextTraffic="true"
+        android:theme="@android:style/Theme.Material.NoActionBar"
+        android:label="Malty" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher">
+        <service android:name=".EmbeddedService" android:exported="false" android:stopWithTask="false"/>
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <activity android:name=".PerchanceVerificationActivity" android:exported="false" />
+        <activity android:name=".DonationActivity" android:exported="false" />
+        <activity android:name=".ThinkingActivity" android:exported="false" />
+        <activity android:name=".CanvasEditorActivity" android:exported="false" />
+        <activity android:name=".AgentActivity" android:exported="false" />
+        <activity android:name=".BlueprintActivity" android:exported="false" />
+        <activity android:name=".WorkflowActivity" android:exported="false" />
+        <activity android:name=".RadioActivity" android:exported="false" />
+        <activity android:name=".EditorActivity" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

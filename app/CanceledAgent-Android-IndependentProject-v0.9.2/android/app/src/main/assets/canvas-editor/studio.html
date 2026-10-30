@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>Canvas Editor</title><style>html,body{margin:0;background:#1e1e1e;color:#eee;font:14px system-ui;height:100%;}#toolbar{display:flex;gap:4px;padding:4px;flex-wrap:wrap}button{border:1px solid #555;color:#eee;background:#293348;border-radius:4px;padding:7px}#editor{position:absolute;top:78px;bottom:45px;left:0;right:0;}#status{position:absolute;bottom:0;left:0;right:0;height:40px;padding:8px;box-sizing:border-box;background:#202936}#find{width:110px;background:#111;color:white;border:1px solid #555}</style></head><body><div id="toolbar"><button id="save">Save</button><button id="undo">Undo</button><button id="redo">Redo</button><input id="find" aria-label="Search text" placeholder="Find"><button id="next">Next</button><button id="prev">Previous</button><button id="commit">Git Commit</button><button id="history">Git Log</button><button id="diff">Diff</button></div><div id="editor"></div><div id="status" role="status">Loading recovered Canvas Editor…</div><script type="module">
+import { CanvasEditor, createRepo, createDefaultStore } from './index.js';
+const status=t=>document.getElementById('status').textContent=t;
+const b=id=>document.getElementById(id);
+let current=null,repo=null;
+function tell(kind,value){try{window.AndroidCanvas[kind](value)}catch(e){status('Native bridge error: '+e.message)}}
+try{
+ if(typeof Worker==='undefined'||typeof OffscreenCanvas==='undefined')throw new Error('WebView lacks Web Worker / OffscreenCanvas');
+ current=new CanvasEditor({theme:'dark',language:'html',fontSize:13});
+ await current.mount(b('editor'),{text:'',language:'html',path:'index.html'});
+ repo=createRepo({store:createDefaultStore('canceled-canvas-v1'),name:'android-studio'});
+ current.on('change',({text})=>tell('onChanged',text));
+ b('save').onclick=()=>tell('onSave',current.getValue());
+ b('undo').onclick=()=>current.undo();b('redo').onclick=()=>current.redo();
+ b('find').oninput=()=>current.setSearch(b('find').value);
+ b('next').onclick=()=>current.findNext();b('prev').onclick=()=>current.findPrev();
+ b('commit').onclick=async()=>{try{const r=await repo.commit({'index.html':current.getValue()},{message:'Canvas Editor commit',author:'local user'});status(r.unchanged?'No changes to commit':'Committed '+r.commit.id)}catch(e){status('Commit failed: '+e.message)}};
+ b('history').onclick=async()=>{try{const rows=await repo.log(8);status(rows.map(r=>r.id+' '+r.message).join(' | ')||'No commits')}catch(e){status(e.message)}};
+ b('diff').onclick=async()=>{try{const log=await repo.log(1);status(log.length?String(await repo.diff(log[0].id)).slice(0,300):'No commits')}catch(e){status(e.message)}};
+ window.canceledEditor={setSource:(text)=>{current.setDoc(text,{force:true});status('Recovered Canvas Editor 1.2.0 ready')},getSource:()=>current.getValue(),command:(name)=>current.command(name)};
+ tell('onReady','ready');
+}catch(e){status('Recovered editor unavailable: '+e.message);tell('onError',e.message)}
+</script></body></html>
