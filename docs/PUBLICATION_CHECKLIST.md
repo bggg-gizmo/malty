@@ -1,0 +1,30 @@
+# Malty public publication checklist
+
+Public repository: https://github.com/bggg-gizmo/malty
+Private development repository: https://github.com/bggg-gizmo/malty-dev
+
+## Completed in the public repository
+
+- [x] Publish a full project README with dynamic GitHub shields, documented capabilities, and explicit test limitations.
+- [x] Publish a verified owl asset as `assets/malty-square-512.png`.
+- [x] Publish contribution and security reporting guidance.
+- [x] Provide structured issue forms and a pull-request template.
+- [x] Commit two GitHub ruleset definitions for `main` and `v*` tags.
+- [x] Commit a no-Actions GitHub CLI ruleset activation and read-only verification utility.
+- [x] Record signed and unsigned v0.9.2 candidate hashes and sizes.
+
+## Outstanding release and repository work
+
+- [ ] Verify private `malty-dev` remote has received all 310 original source-package files at normal paths, and independently check hashes against the manifest.
+- [ ] Confirm which additional development sources and third-party components can legally and safely be published; no blanket redistribution permission has been assumed.
+- [ ] Check the intended public release candidate and any Git history for tokens, API credentials, private signing keys, cookies, personal records, and databases.
+- [ ] Complete or clearly disclose outstanding physical-device, authenticated live-service, and plugin-parity validation.
+- [ ] Upload the specifically approved signed v0.9.2 APK as a GitHub **prerelease**, attach SHA-256 checksums and verification notes, and independently verify GitHub-downloaded bytes.
+- [ ] Activate both rulesets using Settings → Rules → Rulesets or run `python3 scripts/apply_public_rulesets.py` with an authenticated administrative GitHub CLI. Verify the actual remote rulesets with `python3 scripts/apply_public_rulesets.py --check`.
+- [ ] Verify that direct commits, force pushes and deletion of `main` are refused, and that published `v*` tags cannot be changed or removed; test on disposable refs without modifying actual release tags.
+- [ ] Review README version links and actual release downloads after publishing the prerelease.
+- [ ] Choose an appropriate project license if public source redistribution is explicitly approved. Do not assume one.
+
+## Non-regression
+
+The public repository's documentation and issue forms do not change Android application code, UI layouts, embedded services, app identity, APK signing keys, or the existing development commit history. No GitHub Actions are required.
