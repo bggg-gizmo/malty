@@ -50,7 +50,7 @@ The public repository's documentation and issue forms do not change Android appl
 ## 2026-10-29 — checkpoint 5 publication safeguards
 
 - [x] Public APK Git blob and SHA-256 were independently verified; the original signed APK remains published in `downloads/v0.9.2/`.
-- [x] Release publisher and independent download-verification workflow implemented and tested locally (16/16 tests including existing artifact-integrity tests).
+- [x] Release publisher, Windows/Linux launchers, release guide and portable 16-test regression suite implemented, published on public `main` and blob-verified (16/16 tests passed locally).
 - [x] Correct the pending `main` ruleset definition to allow explicitly authorized fast-forward direct `main` publication without requiring pull requests. Protection still prohibits deletion, history rewriting and non-linear history.
 - [ ] Native GitHub Releases `v0.9.2` prerelease: still not published by this checkpoint; GitHub Releases creation is not exposed by the connected Git Data integration.
 - [ ] Activate and independently read back the branch/tag rulesets; stored JSON alone is not active enforcement.

@@ -50,7 +50,10 @@ These capabilities exist in the project source. Their presence does **not** mean
 
 This is a **public testing build**, not a production-certified release. Physical-device acceptance, live authenticated-service operations, and complete recovered-plugin parity remain unverified. GitHub's Releases prerelease entry is not yet created; this downloadable APK is hosted directly in the repository.
 
-See the **[Releases page](https://github.com/bggg-gizmo/malty/releases)** for separately published GitHub Releases when they become available. Download only release artifacts whose publisher and checksums you have verified.
+See the **[Releases page](https://github.com/bggg-gizmo/malty/releases)** for separately published GitHub Releases when they become available.
+
+For the verified GitHub Releases publishing procedure, portable 16-test regression suite, Windows/Linux release launchers and immutable-asset checks, see [v0.9.2 release operations](docs/RELEASE_OPERATION_v0.9.2.md). These tools are present on `main`; a native Releases prerelease entry is still pending.
+ Download only release artifacts whose publisher and checksums you have verified.
 
 - Android 8.0 / API 26 or later is the build's minimum supported Android version.
 - Public device testing, authenticated Moltbook transactions, remote collaboration, and full upstream plugin parity have **not** yet been certified for the v0.9.2 development checkpoint.

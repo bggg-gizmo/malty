@@ -1,0 +1,15 @@
+{
+  "release": "Malty v0.9.2 Android testing",
+  "public_repository": "bggg-gizmo/malty",
+  "public_main_publisher_commit": "3260686f90e4ebac89c2cd8d64f49b162072574e",
+  "development_repository": "bggg-gizmo/malty-dev",
+  "development_main_verified_commit": "f770d856d742017442accea5058bb689943e8466",
+  "public_apk_sha256": "a7baf8e9dbe00dd7879da445b109cac82870b81483e9a627b5b149f448c8cb0e",
+  "public_apk_git_blob_sha1": "25ad469fe17db0a7cac26597d2afb8b22ae52403",
+  "test_suite": "16/16 passed locally",
+  "native_github_release_created": false,
+  "public_rulesets_active": false,
+  "on_device_acceptance": "not verified",
+  "live_authenticated_service_acceptance": "not verified",
+  "third_party_plugin_parity": "not certified"
+}
