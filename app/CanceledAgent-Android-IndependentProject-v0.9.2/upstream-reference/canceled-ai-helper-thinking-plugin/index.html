@@ -1,0 +1,80 @@
+<style>
+body{text-align:left;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#14161c;color:#e9ebf1;margin:0;padding:16px}
+.wrap{max-width:760px;margin:0 auto}
+.card{background:#1e2230;border:1px solid #323a52;border-radius:12px;padding:14px;margin:12px 0}
+.muted{color:#9aa3b8;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{cursor:pointer;border:1px solid #3a4563;background:#2a3350;color:#fff;border-radius:9px;padding:8px 12px;font-size:14px}
+pre{background:#0e1118;border:1px solid #323a52;border-radius:9px;padding:10px;white-space:pre-wrap;font-size:12.5px;color:#c8d0e4;overflow:auto}
+code{background:#0e1118;border:1px solid #323a52;border-radius:6px;padding:1px 6px;font-size:12.5px}
+h1{margin:6px 0} h3{margin:10px 0 4px}
+</style>
+<div class="wrap">
+<h1>🧠 AI Helper Thinking Plugin</h1>
+<div class="muted">An editor-only thought log for the AI helper. It captures the thinking behind each change, lets you rate pivots 👍/👎, revert linked changes, and copy ratings as instructions. Hidden automatically on the published page.</div>
+<div class="card">
+<h3>1. Install (lists panel)</h3>
+<pre>aiThinking = \{import:canceled-ai-helper-thinking-plugin\}</pre>
+<h3>2. Embed (HTML panel)</h3>
+<pre>\[aiThinking(\{key:"build"\})\]</pre>
+<div class="muted">Default is a floating picture-in-picture window (draggable, collapsible, position is remembered) so thinking stays visible beside the generator output. For an inline panel instead: <code>root.aiThinking(\{key:"build", mode:"inline"\})</code>. One widget per area; <code>key</code> keeps their logs separate. Optional <code>title</code> renames the window.</div>
+<h3>3. Log thinking + changes (helper or your code)</h3>
+<pre>let h = root.aiThinking(\{key:"build"\});
+h.think("Switching to single column — the editor preview is narrow.");
+h.act("Rewrote the panel CSS.", \{changeLabel:"css rewrite"\});
+h.pipe(\{kind:"change", text:"Tried a sidebar; may revert.", changeLabel:"v3 sidebar", snapshot:document.body.innerHTML\});
+h.trace(entryId); // full parent chain back to the root thought</pre>
+<div class="muted">Unified pipeline: every entry gets a sequence number, a kind (think/action/change), and a parent link to the previous thought. ⤴ Trace on any card shows its chain; Trace view renders whole chains indented. The copy button now includes thinking IDs plus a TRACE-BACK section so rated feedback points at exact thoughts. Use ⤓ Export traces to share the full JSON.</div>
+<h3>4. Revert hook (host generator)</h3>
+<pre>window.addEventListener("ai-thinking-revert", e =&gt; \{
+  document.body.innerHTML = e.detail.entry.snapshot;
+\});
+window.__aiThinkingOnRevert = (key, entry) =&gt; \{\};</pre>
+<div class="muted">Without a hook, Revert copies the snapshot to the clipboard so you can paste it back manually. Every change entry shows a snapshot preview with Copy + Revert buttons.</div>
+<h3>5. Helper bridge (page_eval, editor only)</h3>
+<pre>window.logAiThought("Choosing X because Y. Pivots next action to Z.", \{pivot:true\});
+window.__aiThink.log("build", "Same, but for a non-default key.");</pre>
+<div class="muted">Editor-only rule: the panel renders only when the page is in edit mode (edit hash, unsaved preview, or <code>?showThinking=1</code>). Pass <code>forceShow:true</code> to preview it anywhere. Published pages get an empty string — no thought text leaks into public HTML.</div>
+<div class="row" style="margin-top:10px">
+<button id="hideBtn">Simulate published page (hide panels)</button>
+<button id="showBtn">Back to editor view</button>
+</div>
+</div>
+<div class="card">
+<h3 style="margin-top:0">Troubleshooting</h3>
+<div class="muted">Getting <code>Your curly block "\{import:...\}" doesn't appear to have the correct syntax</code>? That means the literal placeholder <code>\{import:...\}</code> was pasted. The <code>...</code> must be replaced with the real plugin name — paste exactly this in the lists panel, never in the HTML panel:</div>
+<pre>aiThinking = \{import:canceled-ai-helper-thinking-plugin\}</pre>
+<div class="muted">Never import this plugin inside its own lists panel (circular). Its own page calls <code>$output()</code> directly.</div>
+</div>
+<div class="card">
+<h3 style="margin-top:0">Live demo — floating window (default log)</h3>
+<div class="muted">This widget floats bottom-right. Drag it, collapse it, rate the thoughts, copy the feedback.</div>
+[$output()]
+</div>
+<div class="card">
+<h3 style="margin-top:0">Live demo — inline panel (change tracking)</h3>
+<div class="muted">Same plugin with <code>mode:"inline"</code>. Entries with snapshots get ↩ Revert buttons.</div>
+[$output({key:"changes", mode:"inline"})]
+</div>
+</div>
+<script>
+window.addEventListener("ai-thinking-revert", function(e) {
+  try {
+    var bar = document.createElement("div");
+    bar.textContent = "Revert requested for: " + (e.detail.entry.changeLabel || e.detail.entry.text).slice(0, 120);
+    bar.style.cssText = "position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#ffd76a;color:#231a02;padding:10px 16px;border-radius:999px;font-weight:700;z-index:99";
+    document.body.appendChild(bar);
+    setTimeout(function(){ bar.remove(); }, 2500);
+  } catch(err) {}
+});
+document.getElementById("hideBtn").onclick = function() {
+  window.__aiThink.forceHide = true;
+  window.__aiThink.refresh("default");
+  window.__aiThink.refresh("changes");
+};
+document.getElementById("showBtn").onclick = function() {
+  window.__aiThink.forceHide = false;
+  window.__aiThink.refresh("default");
+  window.__aiThink.refresh("changes");
+};
+</script>

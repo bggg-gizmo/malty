@@ -1,0 +1,558 @@
+$meta
+  title = AI Helper Thinking Plugin
+  description = Editor-only thought log for the AI helper. Rate pivots good vs bad, revert linked changes, copy ratings as instructions.
+  tags = plugin, ai, editor, feedback, thinking
+  header
+    mode = minimal
+    
+$output(opts) =>
+  let key = "default";
+  try {
+    let k = opts ? opts.key : null;
+    if (k !== null && k !== undefined) {
+      if (typeof k === "object" && k !== null && k.evaluateItem !== undefined) key = String(k.evaluateItem);
+      else key = String(k);
+    }
+  } catch(e) {}
+  key = key.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) || "default";
+  let forceShow = false;
+  try { forceShow = !!(opts && (opts.forceShow === true || String(opts.forceShow) === "true")); } catch(e) {}
+  function readOpt(n, d) {
+    try {
+      let v = opts ? opts[n] : null;
+      if (v === null || v === undefined) return d;
+      if (typeof v === "object" && v !== null && v.evaluateItem !== undefined) return String(v.evaluateItem);
+      return String(v);
+    } catch(e) { return d; }
+  }
+  let mode = readOpt("mode", "pip");
+  if (mode !== "inline") mode = "pip";
+  let title = readOpt("title", "AI helper thinking");
+  if (!window.__aiThink) {
+    window.__aiThink = {
+      states: {},
+      filters: {},
+      drafts: {},
+      previews: {},
+      forced: {},
+      forceHide: false,
+      modes: {},
+      titles: {},
+      collapsed: {},
+      closed: {},
+      seqs: {},
+      views: {},
+      traceFocus: {},
+      lastIds: {},
+      storeKey: function(k) {
+        let g = "unknown";
+        try { g = window.generatorName || "unknown"; } catch(e) {}
+        return "ai-thinking-plugin:" + g + ":" + k;
+      },
+      isEditor: function() {
+        try { if (window.generatorIsInEditMode === true) return true; } catch(e) {}
+        try { if (window.generatorIsUnsaved === true) return true; } catch(e) {}
+        try { if (String(location.hash).toLowerCase().indexOf("edit") >= 0) return true; } catch(e) {}
+        try { if (String(location.search).indexOf("showThinking=1") >= 0) return true; } catch(e) {}
+        return false;
+      },
+      visible: function(k) {
+        if (this.forceHide) return false;
+        if (this.forced[k]) return true;
+        return this.isEditor();
+      },
+      stateFor: function(k) {
+        if (!this.states[k]) {
+          let arr = [];
+          try { arr = JSON.parse(localStorage.getItem(this.storeKey(k)) || "[]"); } catch(e) { arr = []; }
+          if ((!arr || !arr.length) && k === "default") {
+            try {
+              let legacy = JSON.parse(localStorage.getItem("ai-thought-ratings-v1") || "[]");
+              if (legacy && legacy.length) arr = legacy;
+            } catch(e) {}
+          }
+          this.states[k] = Array.isArray(arr) ? arr : [];
+        }
+        return this.states[k];
+      },
+      save: function(k) {
+        try { localStorage.setItem(this.storeKey(k), JSON.stringify(this.states[k] || [])); } catch(e) {}
+      },
+      uid: function() {
+        return "t" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+      },
+      esc: function(s) {
+        return String(s === null || s === undefined ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      },
+      fmtTime: function(t) {
+        try { return new Date(t).toLocaleString(); } catch(e) { return ""; }
+      },
+      log: function(k, text, o) {
+        o = o || {};
+        if (!text || !String(text).trim()) return null;
+        let arr = this.stateFor(k);
+        if (!this.seqs[k]) {
+          let mx = 0;
+          for (let i = 0; i < arr.length; i++) if (arr[i].seq > mx) mx = arr[i].seq;
+          this.seqs[k] = mx;
+        }
+        this.seqs[k]++;
+        let parent = o.parentId || o.parent || this.lastIds[k] || "";
+        let e = { id: this.uid(), seq: this.seqs[k], kind: o.kind || (o.changeLabel || o.snapshot ? "change" : "think"), text: String(text), time: Date.now(), rating: 0, pivot: !!o.pivot, source: o.source || "ai", changeLabel: o.changeLabel || "", snapshot: o.snapshot || "", parentId: parent || "", actor: o.actor || "helper", turn: o.turn || "" };
+        arr.unshift(e);
+        this.lastIds[k] = e.id;
+        this.save(k);
+        this.refresh(k);
+        return e.id;
+      },
+      pipe: function(k, evt) {
+        evt = evt || {};
+        if (typeof evt === "string") return this.log(k, evt, { kind: "think", pivot: true });
+        return this.log(k, evt.text || evt.thought || "(empty)", { kind: evt.kind || "think", pivot: evt.pivot !== undefined ? !!evt.pivot : true, source: evt.source || "ai", changeLabel: evt.changeLabel || evt.label || "", snapshot: evt.snapshot || "", parentId: evt.parentId || evt.parent || "", actor: evt.actor || "helper", turn: evt.turn || "" });
+      },
+      think: function(k, text, o) {
+        o = o || {};
+        o.kind = "think";
+        if (o.pivot === undefined) o.pivot = true;
+        return this.log(k, text, o);
+      },
+      act: function(k, text, o) {
+        o = o || {};
+        o.kind = "action";
+        if (o.pivot === undefined) o.pivot = true;
+        return this.log(k, text, o);
+      },
+      logChange: function(k, label, snapshot, thoughtText) {
+        return this.log(k, thoughtText || ("Change: " + label), { kind: "change", pivot: true, source: "ai", changeLabel: label, snapshot: snapshot || "", parentId: this.lastIds[k] || "" });
+      },
+      byId: function(k, id) {
+        let arr = this.stateFor(k);
+        for (let i = 0; i < arr.length; i++) if (arr[i].id === id) return arr[i];
+        return null;
+      },
+      children: function(k, id) {
+        return this.stateFor(k).filter(function(x) { return x.parentId === id; });
+      },
+      trace: function(k, id) {
+        let chain = [];
+        let cur = this.byId(k, id);
+        let guard = 0;
+        while (cur && guard < 200) {
+          chain.push(cur);
+          if (!cur.parentId) break;
+          cur = this.byId(k, cur.parentId);
+          guard++;
+        }
+        return chain.reverse();
+      },
+      lineageText: function(k, id) {
+        return this.trace(k, id).map(function(e) { return "[" + (e.kind || "think") + " #" + (e.seq || "?") + "] " + e.text; }).join("\n  <- ");
+      },
+      exportJson: function(k) {
+        return JSON.stringify({ key: k, exportedAt: Date.now(), entries: this.stateFor(k) });
+      },
+      importJson: function(k, json) {
+        let d = typeof json === "string" ? JSON.parse(json) : json;
+        let arr = d.entries || d || [];
+        this.states[k] = arr;
+        let mx = 0;
+        for (let i = 0; i < arr.length; i++) if (arr[i].seq > mx) mx = arr[i].seq;
+        this.seqs[k] = mx;
+        this.save(k);
+        this.refresh(k);
+        return arr.length;
+      },
+      entries: function(k) {
+        return this.stateFor(k).slice();
+      },
+      clear: function(k) {
+        this.states[k] = [];
+        this.save(k);
+        this.refresh(k);
+      },
+      rate: function(k, id, v) {
+        let arr = this.stateFor(k);
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].id === id) {
+            arr[i].rating = (arr[i].rating === v) ? 0 : v;
+            if (v !== 0) arr[i].pivot = true;
+          }
+        }
+        this.save(k);
+        this.refresh(k);
+      },
+      togglePivot: function(k, id) {
+        let arr = this.stateFor(k);
+        for (let i = 0; i < arr.length; i++) if (arr[i].id === id) arr[i].pivot = !arr[i].pivot;
+        this.save(k);
+        this.refresh(k);
+      },
+      del: function(k, id) {
+        this.states[k] = this.stateFor(k).filter(function(x) { return x.id !== id; });
+        this.save(k);
+        this.refresh(k);
+      },
+      setFilter: function(k, v) {
+        this.filters[k] = v;
+        this.refresh(k);
+      },
+      setView: function(k, v) {
+        this.views[k] = v;
+        this.refresh(k);
+      },
+      focusTrace: function(k, id) {
+        this.traceFocus[k] = (this.traceFocus[k] === id) ? "" : id;
+        this.refresh(k);
+      },
+      setDraft: function(k, v) {
+        this.drafts[k] = v;
+      },
+      copyText: function(s, k, msg) {
+        let self = this;
+        function done(ok) { self.toast(k, ok ? msg : "Copy blocked — select the preview text manually."); }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(s).then(function() { done(true); }, function() { done(false); });
+        else {
+          let ta = document.createElement("textarea");
+          ta.value = s;
+          document.body.appendChild(ta);
+          ta.select();
+          let ok = false;
+          try { ok = document.execCommand("copy"); } catch(e) {}
+          ta.remove();
+          done(ok);
+        }
+      },
+      copySnapshot: function(k, id) {
+        let arr = this.stateFor(k);
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].id === id) this.copyText(arr[i].snapshot || arr[i].text || "", k, "Snapshot copied — paste it back to revert.");
+        }
+      },
+      revert: function(k, id) {
+        let arr = this.stateFor(k);
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].id === id) {
+            let t = arr[i];
+            try {
+              window.dispatchEvent(new CustomEvent("ai-thinking-revert", { detail: { key: k, entry: { id: t.id, text: t.text, changeLabel: t.changeLabel, snapshot: t.snapshot, time: t.time } } }));
+            } catch(e) {}
+            try { if (typeof window.__aiThinkingOnRevert === "function") window.__aiThinkingOnRevert(k, t); } catch(e) {}
+            this.copySnapshot(k, id);
+          }
+        }
+      },
+      buildFeedback: function(k, nextText) {
+        let arr = this.stateFor(k);
+        let liked = arr.filter(function(t) { return t.rating === 1; });
+        let disliked = arr.filter(function(t) { return t.rating === -1; });
+        let unrated = arr.filter(function(t) { return t.rating === 0 && t.pivot; });
+        let out = "[FEEDBACK FOR AI HELPER — thought ratings]\n";
+        out += "Use these ratings to adjust what you enhance vs remove on the next step.\n\n";
+        out += "ENHANCE / DO MORE OF THIS (" + liked.length + "):\n";
+        out += liked.length ? liked.map(function(t) { return "- 👍 [thinking " + t.id + (t.seq ? " #" + t.seq : "") + "] " + t.text + (t.changeLabel ? " [change: " + t.changeLabel + "]" : "") + (t.pivot ? " [pivoted action]" : ""); }).join("\n") + "\n" : "- (none rated good yet)\n";
+        out += "\nREMOVE / AVOID / UNDO DIRECTION (" + disliked.length + "):\n";
+        out += disliked.length ? disliked.map(function(t) { return "- 👎 [thinking " + t.id + (t.seq ? " #" + t.seq : "") + "] " + t.text + (t.changeLabel ? " [change: " + t.changeLabel + "]" : "") + (t.pivot ? " [pivoted action]" : ""); }).join("\n") + "\n" : "- (none rated bad yet)\n";
+        if (unrated.length) {
+          out += "\nUNRATED PIVOTS — use judgment, listed for context (" + unrated.length + "):\n";
+          out += unrated.map(function(t) { return "- 🔀 [thinking " + t.id + "] " + t.text; }).join("\n") + "\n";
+        }
+        let traced = liked.concat(disliked).slice(0, 6);
+        if (traced.length) {
+          out += "\nTRACE-BACK (how each rated thought was reached):\n";
+          for (let i = 0; i < traced.length; i++) {
+            let ch = this.trace(k, traced[i].id);
+            out += (i + 1) + ". thinking " + traced[i].id + " chain (" + ch.length + " steps):\n";
+            for (let j = 0; j < ch.length; j++) out += "   " + (j + 1) + ") [" + (ch[j].kind || "think") + " #" + (ch[j].seq || "?") + "] " + String(ch[j].text).slice(0, 160) + "\n";
+          }
+        }
+        out += "\nNEXT INSTRUCTIONS:\n" + (nextText && nextText.trim() ? nextText.trim() + "\n" : "(no extra instructions — follow the enhance/remove lists above)\n");
+        out += "\nConfirm you applied the enhance/remove lists in your next reply.";
+        return out;
+      },
+      getFeedback: function(k, nextText) {
+        if (nextText === undefined) nextText = this.drafts[k] || "";
+        return this.buildFeedback(k, nextText);
+      },
+      copyFeedback: function(k) {
+        let s = this.buildFeedback(k, this.drafts[k] || "");
+        this.previews[k] = true;
+        this.copyText(s, k, "Copied! Paste it to the helper with next instructions.");
+        this.refresh(k);
+      },
+      toast: function(k, msg) {
+        let els = document.querySelectorAll('[data-ai-thinking-toast="' + k + '"]');
+        for (let i = 0; i < els.length; i++) {
+          els[i].textContent = msg;
+          els[i].style.display = "block";
+        }
+        setTimeout(function() {
+          let els2 = document.querySelectorAll('[data-ai-thinking-toast="' + k + '"]');
+          for (let j = 0; j < els2.length; j++) els2[j].style.display = "none";
+        }, 2000);
+      },
+      itemHtml: function(k, e) {
+        let border = e.rating === 1 ? "#2ecc71" : (e.rating === -1 ? "#ff5a5a" : "#3a4563");
+        let goodBg = e.rating === 1 ? "#1f9d55" : "#2a3350";
+        let goodBd = e.rating === 1 ? "#1f9d55" : "#3a4563";
+        let goodTx = e.rating === 1 ? "Liked" : "Good idea";
+        let badBg = e.rating === -1 ? "#d64545" : "#2a3350";
+        let badBd = e.rating === -1 ? "#d64545" : "#3a4563";
+        let badTx = e.rating === -1 ? "Disliked" : "Bad idea";
+        let pivotBd = e.pivot ? "#c9a227" : "#3a4563";
+        let kind = e.kind || "think";
+        let seq = e.seq ? "#" + e.seq : "";
+        let nkids = this.children(k, e.id).length;
+        let focused = this.traceFocus[k] === e.id;
+        let h = `<div style="background:#1e2230;border:1px solid #323a52;border-left:4px solid ${border};border-radius:10px;padding:10px;margin:8px 0">`;
+        h += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;color:#9aa3b8"><span style="border:1px solid #2f6fb2;color:#8fd0ff;border-radius:999px;padding:2px 8px">${this.esc(e.source)} · ${this.esc(this.fmtTime(e.time))}</span>`;
+        h += `<span style="border:1px solid #3a4563;color:#c8d0e4;border-radius:999px;padding:2px 8px">${this.esc(kind)} ${this.esc(seq)}</span>`;
+        if (e.pivot) h += `<span style="border:1px solid #c9a227;color:#ffd76a;border-radius:999px;padding:2px 8px">🔀 pivoted action</span>`;
+        if (e.changeLabel) h += `<span style="border:1px solid #3a4563;color:#c8d0e4;border-radius:999px;padding:2px 8px">✎ ${this.esc(e.changeLabel)}</span>`;
+        if (nkids) h += `<span style="border:1px solid #3a4563;color:#9aa3b8;border-radius:999px;padding:2px 8px">↳ ${nkids} follow-up${nkids > 1 ? "s" : ""}</span>`;
+        h += `</div><div style="margin:8px 0;white-space:pre-wrap;font-size:14px">${this.esc(e.text)}</div>`;
+        if (focused) {
+          let chain = this.trace(k, e.id);
+          h += `<div style="background:#0e1118;border:1px solid #c9a227;border-radius:8px;padding:8px;margin:6px 0;font-size:12px;color:#ffd76a">trace-back (${chain.length} steps):<br>`;
+          for (let ti = 0; ti < chain.length; ti++) {
+            let ce = chain[ti];
+            h += `<div style="margin-top:4px;color:#c8d0e4">${ti + 1}. [${this.esc(ce.kind || "think")} #${ce.seq || "?"}] ${this.esc(String(ce.text).slice(0, 140))}${String(ce.text).length > 140 ? "…" : ""}${ce.id === e.id ? " ◀ here" : ""}</div>`;
+          }
+          h += `</div>`;
+        }
+        if (e.snapshot) {
+          let prev = String(e.snapshot).slice(0, 300);
+          let tail = String(e.snapshot).length > 300 ? "…" : "";
+          h += `<details style="margin:6px 0;font-size:12px;color:#9aa3b8"><summary style="cursor:pointer">Snapshot (${String(e.snapshot).length} chars)</summary><pre style="background:#0e1118;border:1px solid #323a52;border-radius:8px;padding:8px;white-space:pre-wrap;max-height:160px;overflow:auto">${this.esc(prev)}${tail}</pre></details>`;
+        }
+        h += `<div style="display:flex;gap:6px;flex-wrap:wrap">`;
+        h += `<button onclick="window.__aiThink.rate('${k}','${e.id}',1)" style="cursor:pointer;border:1px solid ${goodBd};background:${goodBg};color:#fff;border-radius:8px;padding:6px 10px">👍 ${goodTx}</button>`;
+        h += `<button onclick="window.__aiThink.rate('${k}','${e.id}',-1)" style="cursor:pointer;border:1px solid ${badBd};background:${badBg};color:#fff;border-radius:8px;padding:6px 10px">👎 ${badTx}</button>`;
+        h += `<button onclick="window.__aiThink.togglePivot('${k}','${e.id}')" style="cursor:pointer;border:1px solid ${pivotBd};background:#2a3350;color:#fff;border-radius:8px;padding:6px 10px">🔀 Pivot</button>`;
+        if (e.snapshot) h += `<button onclick="window.__aiThink.revert('${k}','${e.id}')" style="cursor:pointer;border:1px solid #c9a227;background:#3a2f10;color:#ffd76a;border-radius:8px;padding:6px 10px">↩ Revert this change</button>`;
+        h += `<button onclick="window.__aiThink.focusTrace('${k}','${e.id}')" style="cursor:pointer;border:1px solid #3a4563;background:#2a3350;color:#fff;border-radius:8px;padding:6px 10px">⤴ Trace</button>`;
+        h += `<button onclick="window.__aiThink.del('${k}','${e.id}')" style="cursor:pointer;border:1px solid #3a4563;background:transparent;color:#9aa3b8;border-radius:8px;padding:6px 10px;margin-left:auto">✕</button>`;
+        return h + `</div></div>`;
+      },
+      inner: function(k) {
+        let arr = this.stateFor(k);
+        let f = this.filters[k] || "all";
+        let liked = arr.filter(function(x) { return x.rating === 1; }).length;
+        let disliked = arr.filter(function(x) { return x.rating === -1; }).length;
+        let pivots = arr.filter(function(x) { return x.pivot; }).length;
+        let items = arr.filter(function(x) {
+          if (f === "liked") return x.rating === 1;
+          if (f === "disliked") return x.rating === -1;
+          if (f === "pivot") return x.pivot;
+          if (f === "unrated") return x.rating === 0;
+          return true;
+        });
+        function sel(v, label) { return `<option value="${v}"${f === v ? " selected" : ""}>${label}</option>`; }
+        let h = `<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:13px;color:#9aa3b8;margin-bottom:8px"><span><b style="color:#fff">${arr.length}</b> thoughts</span><span>👍 <b style="color:#fff">${liked}</b></span><span>👎 <b style="color:#fff">${disliked}</b></span><span>🔀 <b style="color:#fff">${pivots}</b> pivots</span><span style="margin-left:auto">editor-only · hidden when published</span></div>`;
+        h += `<div style="display:flex;gap:8px;margin-bottom:8px"><select onchange="window.__aiThink.setFilter('${k}',this.value)" style="max-width:150px;background:#11141c;color:#e9ebf1;border:1px solid #323a52;border-radius:9px;padding:7px">${sel("all", "Show: All")}${sel("unrated", "Unrated")}${sel("liked", "👍 Liked")}${sel("disliked", "👎 Disliked")}${sel("pivot", "🔀 Pivots")}</select>`;
+        h += `<select onchange="window.__aiThink.setView('${k}',this.value)" style="max-width:130px;background:#11141c;color:#e9ebf1;border:1px solid #323a52;border-radius:9px;padding:7px"><option value="list"${this.views[k] !== "trace" ? " selected" : ""}>List</option><option value="trace"${this.views[k] === "trace" ? " selected" : ""}>Trace view</option></select>`;
+        h += `<button onclick="window.__aiThink.clear('${k}')" style="cursor:pointer;border:1px solid #3a4563;background:#2a3350;color:#fff;border-radius:9px;padding:7px 12px">Clear</button>`;
+        h += `<span style="align-self:center;color:#9aa3b8;font-size:12px">${items.length} shown</span></div>`;
+        if (!items.length) h += `<div style="color:#9aa3b8;font-size:13px;border:1px dashed #323a52;border-radius:9px;padding:10px">No thoughts yet. The helper pushes thinking here via page_eval.</div>`;
+        if (this.views[k] === "trace") {
+          let roots = items.filter(function(x) { return !x.parentId || !this.byId(k, x.parentId); }, this);
+          if (!roots.length) roots = items.slice(0, 8);
+          h += `<div style="background:#0e1118;border:1px solid #323a52;border-radius:9px;padding:8px;margin:4px 0;font-size:12px;color:#9aa3b8">trace view: newest chains first, indent = follow-up. Click ⤴ Trace on any card to isolate its chain.</div>`;
+          let shown = 0;
+          for (let ri = roots.length - 1; ri >= 0 && shown < 6; ri--) {
+            h += this.treeHtml(k, roots[ri].id, 0);
+            shown++;
+          }
+        } else {
+          for (let i = 0; i < items.length; i++) h += this.itemHtml(k, items[i]);
+        }
+        let draft = this.drafts[k] || "";
+        h += `<div style="margin-top:10px"><div style="font-size:13px;font-weight:700;margin-bottom:4px">Next instructions + copy</div>`;
+        h += `<textarea oninput="window.__aiThink.setDraft('${k}',this.value)" rows="2" placeholder="e.g. Keep the minimal style. Drop the sidebar idea." style="background:#11141c;color:#e9ebf1;border:1px solid #323a52;border-radius:9px;padding:9px;width:100%;box-sizing:border-box;font-size:14px">${this.esc(draft)}</textarea>`;
+        h += `<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button onclick="window.__aiThink.copyFeedback('${k}')" style="cursor:pointer;background:#3f6cff;border:1px solid #3f6cff;color:#fff;border-radius:9px;padding:9px 14px;font-weight:700">📋 Copy ratings to send directly to helper with next instructions</button>`;
+        h += `<button onclick="window.__aiThink.togglePreview('${k}')" style="cursor:pointer;border:1px solid #3a4563;background:#2a3350;color:#fff;border-radius:9px;padding:9px 12px">Preview</button></div>`;
+        if (this.previews[k]) h += `<pre style="background:#0e1118;border:1px solid #323a52;border-radius:9px;padding:10px;white-space:pre-wrap;font-size:12px;color:#c8d0e4;max-height:220px;overflow:auto;margin-top:8px">${this.esc(this.buildFeedback(k, draft))}</pre>`;
+        h += `<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button onclick="window.__aiThink.copyText(window.__aiThink.exportJson('${k}'),'${k}','Pipeline JSON copied — paste it to share full traces.')" style="cursor:pointer;border:1px solid #3a4563;background:#2a3350;color:#fff;border-radius:9px;padding:9px 12px">⤓ Export traces</button></div>`;
+        h += `<div data-ai-thinking-toast="${k}" style="display:none;background:#2ecc71;color:#06240f;padding:8px 14px;border-radius:999px;font-weight:600;margin-top:8px;text-align:center"></div></div>`;
+        return h;
+      },
+      togglePreview: function(k) {
+        this.previews[k] = !this.previews[k];
+        this.refresh(k);
+      },
+      treeHtml: function(k, id, depth) {
+        let e = this.byId(k, id);
+        if (!e || depth > 8) return "";
+        let pad = depth * 16;
+        let dot = e.rating === 1 ? "👍" : (e.rating === -1 ? "👎" : (e.kind === "change" ? "✎" : "💭"));
+        let h = `<div style="margin:4px 0 4px ${pad}px;background:#1e2230;border:1px solid #323a52;border-radius:8px;padding:7px 9px;font-size:12px"><span style="color:#9aa3b8">${dot} [${this.esc(e.kind || "think")} #${e.seq || "?"}]</span> <span style="color:#e9ebf1">${this.esc(String(e.text).slice(0, 160))}${String(e.text).length > 160 ? "…" : ""}</span> <button onclick="window.__aiThink.focusTrace('${k}','${e.id}')" style="cursor:pointer;border:1px solid #3a4563;background:transparent;color:#9aa3b8;border-radius:6px;padding:1px 7px;font-size:11px">⤴</button></div>`;
+        let kids = this.children(k, id).sort(function(a, b) { return (a.seq || 0) - (b.seq || 0); });
+        for (let i = 0; i < kids.length; i++) h += this.treeHtml(k, kids[i].id, depth + 1);
+        return h;
+      },
+      dockEl: function(k) {
+        return document.querySelector('[data-ai-thinking-dock="' + k + '"]');
+      },
+      bubbleEl: function(k) {
+        return document.querySelector('[data-ai-thinking-bubble="' + k + '"]');
+      },
+      posKey: function(k) {
+        let g = "unknown";
+        try { g = window.generatorName || "unknown"; } catch(e) {}
+        return "ai-thinking-plugin-pos:" + g + ":" + k;
+      },
+      collapsedKey: function(k) {
+        let g = "unknown";
+        try { g = window.generatorName || "unknown"; } catch(e) {}
+        return "ai-thinking-plugin-collapsed:" + g + ":" + k;
+      },
+      isCollapsed: function(k) {
+        if (this.collapsed[k] === undefined) {
+          try { this.collapsed[k] = localStorage.getItem(this.collapsedKey(k)) === "1"; } catch(e) { this.collapsed[k] = false; }
+        }
+        return !!this.collapsed[k];
+      },
+      dockIndex: function(k) {
+        let keys = Object.keys(this.modes);
+        let i = keys.indexOf(k);
+        return i < 0 ? 0 : i;
+      },
+      ensureDock: function(k) {
+        if (this.dockEl(k) || !document.body) return;
+        let idx = this.dockIndex(k);
+        let d = document.createElement("div");
+        d.setAttribute("data-ai-thinking-dock", k);
+        let pos = null;
+        try { pos = JSON.parse(localStorage.getItem(this.posKey(k)) || "null"); } catch(e) { pos = null; }
+        let css = "position:fixed;z-index:2147483000;width:380px;max-width:calc(100vw - 24px);background:#14161c;color:#e9ebf1;border:1px solid #3f6cff;border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,0.6);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;text-align:left;";
+        if (pos && pos.left) css += "left:" + pos.left + ";top:" + pos.top + ";";
+        else css += "right:" + (12 + idx * 28) + "px;bottom:" + (12 + idx * 28) + "px;";
+        d.style.cssText = css;
+        document.body.appendChild(d);
+        this.refreshDock(k);
+      },
+      dockShell: function(k, bodyHtml) {
+        let t = this.titles[k] || "AI helper thinking";
+        let arr = this.stateFor(k);
+        let liked = arr.filter(function(x) { return x.rating === 1; }).length;
+        let dis = arr.filter(function(x) { return x.rating === -1; }).length;
+        let col = this.isCollapsed(k);
+        let h = `<div onpointerdown="window.__aiThink.startDrag('${k}',event)" style="cursor:move;display:flex;gap:8px;align-items:center;padding:9px 10px;background:#232842;border-bottom:1px solid #323a52;border-radius:13px 13px 0 0;user-select:none;-webkit-user-select:none;touch-action:none">`;
+        h += `<span style="font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🧠 ${this.esc(t)}</span>`;
+        h += `<span style="font-size:11px;color:#9aa3b8;white-space:nowrap">${arr.length} 💭 ${liked}👍 ${dis}👎</span>`;
+        h += `<span style="margin-left:auto;display:flex;gap:6px">`;
+        h += `<button onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();window.__aiThink.toggleDock('${k}')" style="cursor:pointer;border:1px solid #3a4563;background:#2a3350;color:#fff;border-radius:8px;padding:3px 9px;font-size:12px">${col ? "▢" : "—"}</button>`;
+        h += `<button onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();window.__aiThink.closeDock('${k}')" style="cursor:pointer;border:1px solid #3a4563;background:#2a3350;color:#fff;border-radius:8px;padding:3px 9px;font-size:12px">✕</button>`;
+        h += `</span></div>`;
+        h += `<div data-ai-thinking-dockbody="${k}" style="display:${col ? "none" : "block"};max-height:62vh;overflow:auto;padding:10px;">${bodyHtml}</div>`;
+        return h;
+      },
+      refreshDock: function(k) {
+        let d = this.dockEl(k);
+        if (!d) return;
+        if (!this.visible(k) || this.closed[k]) {
+          d.style.display = "none";
+          this.refreshBubble(k);
+          return;
+        }
+        d.style.display = "block";
+        d.innerHTML = this.dockShell(k, this.inner(k));
+        this.refreshBubble(k);
+      },
+      refreshBubble: function(k) {
+        let b = this.bubbleEl(k);
+        let showBubble = !!this.closed[k] && this.visible(k) && this.modes[k] === "pip";
+        if (showBubble && !b && document.body) {
+          b = document.createElement("button");
+          b.setAttribute("data-ai-thinking-bubble", k);
+          b.textContent = "🧠 thinking";
+          b.style.cssText = "position:fixed;z-index:2147483000;right:12px;bottom:12px;cursor:pointer;border:1px solid #3f6cff;background:#232842;color:#fff;border-radius:999px;padding:9px 14px;font-weight:700;font-size:14px;box-shadow:0 8px 28px rgba(0,0,0,0.5);";
+          b.setAttribute("onclick", "window.__aiThink.openDock('" + k + "')");
+          document.body.appendChild(b);
+        } else if (!showBubble && b) b.remove();
+      },
+      toggleDock: function(k) {
+        this.collapsed[k] = !this.isCollapsed(k);
+        try { localStorage.setItem(this.collapsedKey(k), this.collapsed[k] ? "1" : "0"); } catch(e) {}
+        this.refreshDock(k);
+      },
+      closeDock: function(k) {
+        this.closed[k] = true;
+        this.refreshDock(k);
+      },
+      openDock: function(k) {
+        this.closed[k] = false;
+        this.refreshDock(k);
+      },
+      startDrag: function(k, ev) {
+        try { if (ev.button !== undefined && ev.button !== 0) return; } catch(e) {}
+        let d = this.dockEl(k);
+        if (!d) return;
+        try { ev.preventDefault(); } catch(e) {}
+        let r = d.getBoundingClientRect();
+        let sx = ev.clientX - r.left;
+        let sy = ev.clientY - r.top;
+        let self = this;
+        function mv(e) {
+          let x = e.clientX - sx;
+          let y = e.clientY - sy;
+          x = Math.max(-r.width + 90, Math.min(window.innerWidth - 90, x));
+          y = Math.max(0, Math.min(window.innerHeight - 50, y));
+          d.style.left = x + "px";
+          d.style.top = y + "px";
+          d.style.right = "auto";
+          d.style.bottom = "auto";
+        }
+        function up() {
+          window.removeEventListener("pointermove", mv);
+          window.removeEventListener("pointerup", up);
+          try { localStorage.setItem(self.posKey(k), JSON.stringify({ left: d.style.left, top: d.style.top })); } catch(e2) {}
+        }
+        window.addEventListener("pointermove", mv);
+        window.addEventListener("pointerup", up);
+      },
+      refresh: function(k) {
+        let html = this.visible(k) ? this.inner(k) : "";
+        let els = document.querySelectorAll('[data-ai-thinking="' + k + '"]');
+        for (let i = 0; i < els.length; i++) els[i].innerHTML = html;
+        if (this.modes[k] === "pip") {
+          if (this.visible(k)) this.ensureDock(k);
+          this.refreshDock(k);
+        } else {
+          let d = this.dockEl(k);
+          if (d) d.style.display = "none";
+          let b = this.bubbleEl(k);
+          if (b) b.remove();
+        }
+      }
+    };
+  }
+  if (!window.logAiThought) {
+    window.logAiThought = function(text, o) { return window.__aiThink.log("default", text, o); };
+    window.helperThink = window.logAiThought;
+    window.getHelperFeedback = function(next) { return window.__aiThink.getFeedback("default", next); };
+  }
+  window.__aiThink.modes[key] = mode;
+  window.__aiThink.titles[key] = title;
+  let show = forceShow || window.__aiThink.visible(key);
+  if (forceShow) window.__aiThink.forced[key] = true;
+  let html = "";
+  if (mode === "pip") {
+    if (show) window.__aiThink.ensureDock(key);
+    window.__aiThink.refreshDock(key);
+    html = `<span data-ai-thinking-anchor="${key}" style="display:none"></span>`;
+  } else if (show) {
+    html = `<div data-ai-thinking="${key}">${window.__aiThink.inner(key)}</div>`;
+  }
+  let s = new String(html);
+  s.log = function(text, o) { return window.__aiThink.log(key, text, o); };
+  s.pipe = function(evt) { return window.__aiThink.pipe(key, evt); };
+  s.think = function(text, o) { return window.__aiThink.think(key, text, o); };
+  s.act = function(text, o) { return window.__aiThink.act(key, text, o); };
+  s.trace = function(id) { return window.__aiThink.trace(key, id); };
+  s.logChange = function(label, snapshot, thoughtText) { return window.__aiThink.logChange(key, label, snapshot, thoughtText); };
+  s.getFeedback = function(next) { return window.__aiThink.getFeedback(key, next); };
+  s.entries = function() { return window.__aiThink.entries(key); };
+  s.clear = function() { return window.__aiThink.clear(key); };
+  s.revert = function(id) { return window.__aiThink.revert(key, id); };
+  s.refresh = function() { return window.__aiThink.refresh(key); };
+  return s;
