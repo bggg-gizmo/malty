@@ -1,45 +1,65 @@
-# Malty branch protection and release-tag rules
+# Malty public branch and release-tag protection
 
-These instructions apply to **public** https://github.com/bggg-gizmo/malty only. These rules have been prepared but **not applied** to GitHub.
+This document applies to `bggg-gizmo/malty` (public). The repository contains two **prepared** rulesets. The rules are **not active merely because their JSON files are committed**. Verify live status after applying.
 
-## Before enabling the rules
+## Ref and release policy
 
-1. Publish and review the approved public README, artwork, and any approved source or release files on `main` first. Applying the strict rules before the first import would block direct bootstrap pushes.
-2. In repository **Settings → General → Pull Requests**, make sure **Squash merging** is enabled (Rebase merging is optional). The rule requires linear history.
-3. Import `rulesets/malty-main-branch-ruleset.json` using **Settings → Rules → Rulesets → New ruleset → Import a ruleset**, review it, and enable it.
-4. Import `rulesets/malty-release-tags-ruleset.json` the same way to protect release tags matching `v*`. Future tags can be created; existing release tags cannot be moved or deleted by ordinary pushes.
-5. Confirm effective rules on `main` and `v*` in the GitHub rules UI and verify with a disposable feature branch/pull request. Avoid creating a fake public release merely to test tag protection.
-
-GitHub documentation: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository
-
-## Public `main` policy
-
-| Setting | Initial value | Why |
+| Ref | Pinned commit | Meaning |
 | --- | --- | --- |
-| Require a pull request | **On** | Every main-branch change is documented |
-| Required approving reviews | **0** | One-person maintainer workflows would be locked out by a required independent review |
-| Require review conversation resolution | **On** | Blocks merges with unresolved review threads |
-| Dismiss stale approvals | **On** | Already prepared for future multi-maintainer reviews |
-| Code-owner review | **Off** | No named additional reviewers have been configured |
-| Latest-push approval | **Off** | Prevents locking a solo contributor out |
-| Require linear history | **On** | Use squash or rebase, no merge commits |
-| Block force pushes | **On** | Prevents history rewrites |
-| Block branch deletion | **On** | Protects `main` |
-| Required status checks | **None** | No paid GitHub Actions and no independently reporting check is installed |
-| Required deployment checks | **None** | No external deployment reporter configured |
-| Require signed commits | **Off initially** | May reject existing unsigned commits; enable after signing is configured and validated |
-| Bypass actors | **None** | Enforcement is not silently bypassed by repo admins |
+| `main` | Fast-forward mutable | Main development/publication line; direct linear commits remain allowed |
+| `v0.9.2` | `9a1c4439dfe9d05036c051fb87a4be7e8fa317c3` | Historical v0.9.2 public source and unchanged signed testing APK (versionCode 11) |
+| `v0.9.3-rc.1` | `f81d17c5381ecf4d7f36e40ae5486438207bbb46` | Source-only hardened 0.9.3 candidate (versionCode 12); **not** an official production-signed APK |
+| `v0.9.3` | **Not created** | Reserved for a future owner-approved v0.9.3 distribution/release |
 
-Once a second reviewer with write permissions is available, change required approvals to **1** (or more by agreement) and consider code-owner review. Set required checks only **after** you confirm a named external check actually reports a status on pull requests; otherwise GitHub will block every merge waiting for a nonexistent check.
+The v0.9.2 tagged commit contains the original 555143-byte APK Git blob `25ad469fe17db0a7cac26597d2afb8b22ae52403` and the v0.9.2 direct-builder blob. The source candidate tag also contains the original v0.9.2 APK, but its build metadata is v0.9.3. Neither Git tag by itself creates a GitHub Release or signs an APK.
 
-## Public tag policy
+## Protection policy
 
-`refs/tags/v*` is protected from updates and deletions. Tags may still be newly created for releases. Do not move a published tag; publish a new version instead.
+Public `main` is covered by `rulesets/malty-main-branch-ruleset.json`, which prevents deletions, force/non-fast-forward updates, and merge commits. **Direct fast-forward commits remain permitted; no pull request or paid status check is required.** GitHub account permissions continue to apply. No bypass actors are listed. Squash/rebase must remain available if pull requests are used.
 
-## Private dev repository
+All `refs/tags/v*` are covered by `rulesets/malty-release-tags-ruleset.json`: existing matching tags cannot be updated or deleted. **New version tags can still be created**, but must be verified and approved before publication. No bypass actors are listed. There are no automatic restrictions on the creation of arbitrary non-version tag names. Do not move an issued version tag—issue a new version instead.
 
-`bggg-gizmo/malty-dev` remains private. GitHub's ruleset API currently reports that rulesets are unavailable there on the present plan, and GitHub's documentation gates private-repository rulesets to qualifying paid plans. Do not change the visibility of that repository just to obtain free branch protection. Keep a separate reviewed local Git procedure until GitHub plan/entitlements are changed.
+## Install tags and protections
 
-## GitHub limitations
+Use a trusted local computer with Python 3 and [GitHub CLI](https://cli.github.com/), authenticated to the repository as an administrator:
 
-The ChatGPT-connected GitHub integration did not expose a ruleset creation/mutation operation, so these settings are delivered as importable files; the JSON files themselves do **not** enforce rules until imported in GitHub. Existing classic branch-protection state was not readable through this integration, so check Settings → Branches to avoid unintended overlapping rules.
+```sh
+gh auth login
+gh auth status
+git clone https://github.com/bggg-gizmo/malty.git
+cd malty
+python3 scripts/tag_and_protect_public.py --apply
+python3 scripts/tag_and_protect_public.py --check
+```
+
+Windows CMD after cloning:
+
+```bat
+scripts\PROTECT-PUBLIC-HISTORY.cmd --apply
+scripts\PROTECT-PUBLIC-HISTORY.cmd --check
+```
+
+Linux/macOS alternative: `bash scripts/PROTECT-PUBLIC-HISTORY.sh --apply` and `--check`.
+
+The script first checks that the pinned commits are ancestors of the live `main` and contain the expected original APK and direct-build Git blobs. It creates missing **annotated** `v0.9.2` and `v0.9.3-rc.1` tags without moving pre-existing refs, then invokes `scripts/apply_public_rulesets.py` to create and verify both active rulesets. It fails rather than changing a conflicting tag or existing ruleset. Running `--check` makes **no changes**. The script cannot install the rulesets without GitHub administration permissions.
+
+The rule JSONs can alternatively be imported manually at [GitHub repository rulesets](https://github.com/bggg-gizmo/malty/settings/rules) → **New ruleset** → **Import a ruleset**, and reviewed before clicking Create. This manual action does **not** create the version tags; use the tag script for that step.
+
+## Verify enforcement
+
+```sh
+gh api repos/bggg-gizmo/malty/git/ref/tags/v0.9.2
+gh api repos/bggg-gizmo/malty/git/ref/tags/v0.9.3-rc.1
+gh api repos/bggg-gizmo/malty/rulesets
+python3 scripts/tag_and_protect_public.py --check
+```
+
+GitHub's `main` branch readout should say protected; two active rulesets should have the specified targets and rules. Avoid creating fake tags or attempting destructive force pushes as a test. If classic branch protection exists separately, check [Settings → Branches](https://github.com/bggg-gizmo/malty/settings/branches): GitHub layers both policies and the stricter combination applies.
+
+## Private development repository
+
+`bggg-gizmo/malty-dev` remains private. On October 30, 2026 its ruleset endpoint returned **403** with the GitHub message: `Upgrade to GitHub Pro or make this repository public to enable this feature.` Do **not** expose the private repository just for protection. Until plan entitlements change, enforce private branch/tag discipline with authorized reviewer policy, locally verified commits, and manual controls. No private rulesets are claimed active.
+
+## Capability boundary
+
+The connected ChatGPT GitHub integration supports file/tree/commit/branch-ref publication but does not expose an action to create `refs/tags/*` or mutate repository rulesets. Only an administrator through the GitHub UI or locally authenticated GitHub CLI can complete these operations here. A checked-in JSON configuration is not proof of active enforcement. No paid GitHub Actions are used.
