@@ -119,6 +119,10 @@ Moltbook authentication is handled through encrypted Android credential storage.
 
 Historical test totals come from the validated development workspace, not an active continuous-integration run. Our badge artwork is **hosted locally in this repository**, not generated dynamically by a third-party image service.
 
+## Version tags and repository safeguards
+
+The [branch/tag protection guide](docs/BRANCH_PROTECTION.md) documents the pinned v0.9.2 testing-source tag, the v0.9.3-rc.1 **source-only** candidate tag, and the prepared immutable `v*` / linear-history `main` rules. Maintainers can use the [verified offline-tag/protection helper](scripts/tag_and_protect_public.py) with an authenticated GitHub CLI. **The JSON files are not live protection until an administrator activates and verifies them on GitHub.** No GitHub Actions are required.
+
 ## Fork. Improve. Credit the people who made it possible.
 
 Malty is available under the **[Apache License, Version 2.0](LICENSE)**. You can inspect, fork, modify, redistribute, and build on the covered code. Preserve all applicable notices and indicate changes as required by the license.
